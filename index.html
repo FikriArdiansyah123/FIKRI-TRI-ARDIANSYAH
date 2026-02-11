@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fikri Tri Ardiansyah | Creative Portfolio</title>
+
+    <link rel="icon" type="image/png" href="https://i.ibb.co.com/200C5TSq/Chat-GPT-Image-11-Feb-2026-12-42-35-1.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#050505',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #030303;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -3;
+            filter: blur(80px);
+            opacity: 0.7;
+        }
+
+        #canvas-particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* FIXED: Z-index dinaikkan agar partikel muncul di atas konten di HP */
+        #canvas-cursor {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; 
+            pointer-events: none; /* Tetap bisa klik tombol di bawahnya */
+        }
+
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-4px);
+            background: rgba(30, 30, 30, 0.6);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .text-glow { text-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+    </style>
+</head>
+<body class="antialiased selection:bg-purple-500/30">
+
+    <canvas id="canvas-bg"></canvas> 
+    <canvas id="canvas-particles"></canvas>
+    <canvas id="canvas-cursor"></canvas> 
+    
+    <nav class="fixed top-0 w-full z-[60] border-b border-white/5 bg-black/10 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="font-heading font-bold text-xl tracking-wide hover:text-purple-400 transition z-50 relative">FTA.</a>
+            
+            <div class="hidden md:flex gap-8 text-sm font-medium text-gray-300 items-center">
+                <a href="#about" class="hover:text-white transition relative group">About<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span></a>
+                <a href="#projects" class="hover:text-white transition relative group">Projects<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span></a>
+                <a href="#orders" class="hover:text-white transition relative group">Orders<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span></a>
+                <a href="#contact" class="hover:text-white transition relative group">Contact<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span></a>
+            </div>
+
+            <button id="menu-toggle" class="md:hidden text-gray-300 hover:text-white p-2 z-50 relative focus:outline-none">
+                <i class="ph ph-list text-2xl" id="menu-icon-open"></i>
+                <i class="ph ph-x text-2xl hidden" id="menu-icon-close"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-black/95 z-[70] hidden flex-col items-center justify-center space-y-8 text-3xl font-heading font-bold backdrop-blur-xl transition-all duration-300">
+        <a href="#about" class="mobile-link hover:text-purple-400 transition">About</a>
+        <a href="#projects" class="mobile-link hover:text-purple-400 transition">Projects</a>
+        <a href="#orders" class="mobile-link hover:text-purple-400 transition">Orders</a>
+        <a href="#contact" class="mobile-link hover:text-purple-400 transition">Contact</a>
+    </div>
+
+    <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto relative z-10">
+        <section class="flex flex-col items-center text-center mb-24 animate-float">
+            <div class="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-900/10 text-purple-200 text-xs font-medium uppercase tracking-wider backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                Open for Projects
+            </div>
+
+            <h1 class="font-heading text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+                Fikri Tri<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 text-glow">Ardiansyah</span>
+            </h1>
+
+            <p class="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
+                Membangun pengalaman web yang <span class="text-white font-semibold">modern & interaktif</span>. 
+                Menggabungkan estetika desain dengan kode yang presisi.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#projects" class="px-8 py-3 bg-white text-black rounded-xl font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                    Lihat Karya
+                </a>
+                <a href="https://github.com/FikriArdiansyah123" target="_blank" class="px-8 py-3 glass-panel rounded-xl font-bold flex items-center gap-2 hover:bg-white/10">
+                    <i class="ph ph-github-logo text-xl"></i> GitHub
+                </a>
+            </div>
+        </section>
+
+        <section id="about" class="mb-32 pt-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="font-heading text-3xl font-bold">Dashboard</h2>
+                <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5 md:auto-rows-[180px]">
+                
+                <div class="glass-panel md:col-span-2 md:row-span-2 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden group min-h-[320px] md:min-h-0">
+                    <div class="absolute top-0 right-0 p-24 bg-purple-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-600/30 transition"></div>
+                    <div>
+                        <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 text-purple-400 border border-white/5">
+                            <i class="ph ph-user text-2xl"></i>
+                        </div>
+                        <h3 class="font-heading text-2xl font-bold mb-3">Tentang Saya</h3>
+                        <p class="text-gray-400 leading-relaxed text-sm md:text-base">
+                            Halo! Saya Fikri. Saya merupakan penghafal Al-Qur’an 30 juz yang berkomitmen menjaga hafalan serta mengamalkan nilai-nilai Al-Qur’an dalam kehidupan. Saya bercita-cita menjadi IT Professional yang berintegritas dan mampu berkontribusi positif melalui pemanfaatan teknologi informasi bagi masyarakat..
+                        </p>
+                    </div>
+                    <div class="flex gap-2 mt-6">
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-xs font-medium text-gray-300 border border-white/5">Frontend</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-xs font-medium text-gray-300 border border-white/5">UI Design</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel md:col-span-1 md:row-span-2 rounded-3xl p-6 flex flex-col min-h-[250px] md:min-h-0">
+                    <h3 class="font-heading text-lg font-bold mb-6 text-gray-200">Hobby</h3>
+                    <div class="flex flex-col gap-3 flex-1 justify-center">
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                            <i class="ph ph-atom text-cyan-400 text-xl"></i> <span class="text-sm font-medium">Reading</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                            <i class="ph ph-paint-brush-broad text-blue-400 text-xl"></i> <span class="text-sm font-medium">Murojaah</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                            <i class="ph ph-file-ts text-blue-600 text-xl"></i> <span class="text-sm font-medium">Futsal</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                            <i class="ph ph-figma-logo text-pink-400 text-xl"></i> <span class="text-sm font-medium">Badminton</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="https://www.instagram.com/f_t_fta/" target="_blank" class="glass-panel rounded-3xl p-6 flex items-center justify-between cursor-pointer group min-h-[100px] md:min-h-0">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase tracking-widest font-bold">Connect</p>
+                        <p class="font-heading text-xl font-bold text-white group-hover:text-blue-400 transition">Instagram</p>
+                    </div>
+                    <i class="ph ph-arrow-up-right text-gray-500 group-hover:text-white transition"></i>
+                </a>
+                
+                <a href="https://maps.app.goo.gl/hdWu2iSAhWhkayo67" target="_blank" class="glass-panel rounded-3xl p-6 flex flex-col justify-center relative overflow-hidden group min-h-[100px] md:min-h-0">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent transition-opacity group-hover:opacity-40"></div>
+                    <p class="text-gray-400 text-xs relative z-10 uppercase tracking-widest font-bold">Location</p>
+                    <div class="flex items-center gap-2 relative z-10 mt-1">
+                        <p class="font-heading text-xl font-bold group-hover:text-purple-400 transition">Sidoarjo, ID</p>
+                        <i class="ph ph-map-pin text-purple-400 animate-bounce"></i>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="projects" class="mb-32 pt-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="font-heading text-3xl font-bold">Featured Projects</h2>
+                <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <a href="https://fikriardiansyah123.github.io/VANDSTAVOR-ALBUM/" target="_blank" class="glass-panel rounded-3xl overflow-hidden group block">
+                    <div class="h-64 relative overflow-hidden bg-gray-900">
+                        <img src="https://i.ibb.co.com/99bP0T7m/Screenshot-80.png" alt="Timeless Memories Book" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div class="absolute bottom-6 left-8">
+                            <span class="font-heading text-2xl font-bold">Timeless Memories Book</span>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <p class="text-gray-400 text-sm mb-4">Platform digital untuk mengabadikan setiap momen berharga dalam bentuk jurnal interaktif yang elegan.</p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">React</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Tailwind</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://fikriardiansyah123.github.io/Presensi-Mahasiswa/" target="_blank" class="glass-panel rounded-3xl overflow-hidden group block">
+                    <div class="h-64 relative overflow-hidden bg-gray-900">
+                        <img src="https://i.ibb.co.com/x8rBq8LZ/Screenshot-86-1.png" alt="Student Presence" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div class="absolute bottom-6 left-8">
+                            <span class="font-heading text-2xl font-bold">Student Presence</span>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <p class="text-gray-400 text-sm mb-4">Sistem manajemen kehadiran siswa berbasis web yang efisien, memudahkan pemantauan kehadiran secara real-time.</p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Next.js</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Firebase</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="orders" class="mb-32 pt-16">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="font-heading text-3xl font-bold">Orders</h2>
+                <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
+            </div>
+            <div class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                    <div class="flex-1 text-center md:text-left">
+                        <h3 class="font-heading text-2xl md:text-3xl font-bold mb-4">Mulai Proyek Impianmu Sekarang</h3>
+                        <p class="text-gray-400 leading-relaxed mb-8">Saya menerima pesanan pembuatan website kustom, desain antarmuka (UI/UX), hingga sistem manajemen data. Setiap proyek dikerjakan dengan standar kualitas tinggi dan presisi.</p>
+                        <ul class="space-y-4 mb-8 inline-block text-left">
+                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Landing Page & Portfolio Modern</li>
+                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Sistem Informasi Sekolah/Bisnis</li>
+                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Maintenance & Optimalisasi Web</li>
+                        </ul><br>
+                        <a href="mailto:fikritri579@gmail.com?subject=Tanya%20Proyek%20Website" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg shadow-purple-500/20">
+                            Pesan Sekarang
+                        </a>
+                    </div>
+                    <div class="hidden lg:block w-64 h-64 bg-purple-500/10 rounded-full border border-purple-500/20 animate-pulse flex items-center justify-center">
+                        <i class="ph ph-shopping-cart text-8xl text-purple-400/50"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact" class="text-center pt-16 pb-10 border-t border-white/10">
+            <h2 class="font-heading text-2xl font-bold mb-4">Let's work together</h2>
+            <a href="mailto:fikritri579@gmail.com?subject=Halo%20Fikri!&body=Saya%20tertarik%20untuk%20bekerja%20sama..." 
+               class="text-2xl md:text-4xl font-bold text-gray-500 hover:text-white transition duration-300 border-b-2 border-transparent hover:border-purple-400 inline-block pb-1">
+               fikritri579@gmail.com
+            </a>
+            <p class="mt-8 text-sm text-gray-600">© 2026 Fikri Tri Ardiansyah. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIconOpen = document.getElementById('menu-icon-open');
+        const menuIconClose = document.getElementById('menu-icon-close');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        function toggleMenu() {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+            menuIconOpen.classList.toggle('hidden');
+            menuIconClose.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+
+        // Background Animation
+        const canvasBg = document.getElementById('canvas-bg');
+        const ctxBg = canvasBg.getContext('2d');
+        let widthBg, heightBg, orbs = [];
+        const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+        function resizeBg() {
+            widthBg = window.innerWidth; heightBg = window.innerHeight;
+            canvasBg.width = widthBg; canvasBg.height = heightBg;
+            initBg();
+        }
+        window.addEventListener('resize', resizeBg);
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('touchmove', (e) => { 
+            if(e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX; 
+                mouse.y = e.touches[0].clientY; 
+            }
+        });
+
+        class Orb {
+            constructor(color, size, speed, offset) {
+                this.x = Math.random() * widthBg; this.y = Math.random() * heightBg;
+                this.color = color; this.size = size; this.speed = speed; this.offset = offset;
+                this.time = Math.random() * 100;
+            }
+            update() {
+                this.time += 0.005;
+                const floatX = Math.sin(this.time + this.offset) * 150;
+                const floatY = Math.cos(this.time * 0.8 + this.offset) * 150;
+                this.x += (mouse.x + floatX - this.x) * this.speed;
+                this.y += (mouse.y + floatY - this.y) * this.speed;
+            }
+            draw() {
+                ctxBg.beginPath();
+                const gradient = ctxBg.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, this.color); gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                ctxBg.fillStyle = gradient; ctxBg.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctxBg.fill();
+            }
+        }
+        function initBg() {
+            orbs = [
+                new Orb('rgba(124, 58, 237, 0.45)', Math.max(widthBg, heightBg) * 0.4, 0.02, 0),
+                new Orb('rgba(59, 130, 246, 0.35)', Math.max(widthBg, heightBg) * 0.35, 0.015, 2),
+                new Orb('rgba(45, 212, 191, 0.3)', Math.max(widthBg, heightBg) * 0.3, 0.01, 4)
+            ];
+        }
+        function animateBg() {
+            ctxBg.clearRect(0, 0, widthBg, heightBg);
+            ctxBg.globalCompositeOperation = 'screen';
+            orbs.forEach(orb => { orb.update(); orb.draw(); });
+            requestAnimationFrame(animateBg);
+        }
+        resizeBg(); animateBg();
+
+        // Particle Static
+        const canvasP = document.getElementById('canvas-particles');
+        const ctxP = canvasP.getContext('2d');
+        let widthP, heightP, particles = [];
+        function resizeP() {
+            widthP = window.innerWidth; heightP = window.innerHeight;
+            canvasP.width = widthP; canvasP.height = heightP;
+            initParticles();
+        }
+        window.addEventListener('resize', resizeP);
+        class Particle {
+            constructor() {
+                this.x = Math.random() * widthP; this.y = Math.random() * heightP;
+                this.size = Math.random() * 1.5 + 0.5; this.speedY = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() { this.y -= this.speedY; if (this.y < 0) this.y = heightP; }
+            draw() { ctxP.beginPath(); ctxP.fillStyle = `rgba(255, 255, 255, ${this.opacity})`; ctxP.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctxP.fill(); }
+        }
+        function initParticles() {
+            particles = []; for (let i = 0; i < 60; i++) particles.push(new Particle());
+        }
+        function animateParticles() {
+            ctxP.clearRect(0, 0, widthP, heightP);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        resizeP(); animateParticles();
+
+        // CURSOR SPARKS (FIXED FOR MOBILE VISIBILITY)
+        const canvasC = document.getElementById('canvas-cursor');
+        const ctxC = canvasC.getContext('2d');
+        let widthC, heightC, cursorParticles = [];
+        const colors = ['#a855f7', '#3b82f6', '#2dd4bf', '#ffffff']; 
+
+        function resizeC() { widthC = window.innerWidth; heightC = window.innerHeight; canvasC.width = widthC; canvasC.height = heightC; }
+        window.addEventListener('resize', resizeC); resizeC();
+
+        class CursorParticle {
+            constructor(x, y) {
+                this.x = x; this.y = y; this.vx = (Math.random() - 0.5) * 8; this.vy = (Math.random() - 0.5) * 8;
+                this.size = Math.random() * 5 + 2; // Ukuran sedikit diperbesar agar terlihat di HP
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.opacity = 1;
+            }
+            update() { this.x += this.vx; this.y += this.vy; this.opacity -= 0.02; this.size *= 0.95; }
+            draw() { 
+                ctxC.save(); 
+                ctxC.globalAlpha = this.opacity; 
+                ctxC.beginPath(); 
+                ctxC.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctxC.fillStyle = this.color; 
+                ctxC.fill(); 
+                ctxC.restore(); 
+            }
+        }
+
+        function createSparks(x, y) {
+            for (let i = 0; i < 4; i++) {
+                cursorParticles.push(new CursorParticle(x, y));
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => { createSparks(e.clientX, e.clientY); });
+        window.addEventListener('touchmove', (e) => { 
+            if(e.touches.length > 0) {
+                createSparks(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        function animateCursor() {
+            ctxC.clearRect(0, 0, widthC, heightC);
+            for (let i = 0; i < cursorParticles.length; i++) {
+                cursorParticles[i].update(); cursorParticles[i].draw();
+                if (cursorParticles[i].opacity <= 0) { cursorParticles.splice(i, 1); i--; }
+            }
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+    </script>
+</body>
+</html>
