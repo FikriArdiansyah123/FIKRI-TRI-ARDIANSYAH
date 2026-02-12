@@ -225,8 +225,8 @@
                     <div class="p-8">
                         <p class="text-gray-400 text-sm mb-4">Platform digital untuk mengabadikan setiap momen berharga dalam bentuk jurnal interaktif yang elegan.</p>
                         <div class="flex gap-2">
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">React</span>
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Tailwind</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Static</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Landing</span>
                         </div>
                     </div>
                 </a>
@@ -242,8 +242,8 @@
                     <div class="p-8">
                         <p class="text-gray-400 text-sm mb-4">Sistem manajemen kehadiran siswa berbasis web yang efisien, memudahkan pemantauan kehadiran secara real-time.</p>
                         <div class="flex gap-2">
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Next.js</span>
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Firebase</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Cloud API</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Frontend</span>
                         </div>
                     </div>
                 </a>
@@ -261,13 +261,15 @@
                         <h3 class="font-heading text-2xl md:text-3xl font-bold mb-4">Mulai Proyek Impianmu Sekarang</h3>
                         <p class="text-gray-400 leading-relaxed mb-8">Saya menerima pesanan pembuatan website kustom, desain antarmuka (UI/UX), hingga sistem manajemen data. Setiap proyek dikerjakan dengan standar kualitas tinggi dan presisi.</p>
                         <ul class="space-y-4 mb-8 inline-block text-left">
-                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Landing Page & Portfolio Modern</li>
+                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Personal Portofolio Web</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Sistem Informasi Sekolah/Bisnis</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Maintenance & Optimalisasi Web</li>
                         </ul><br>
-                        <a href="mailto:fikritri579@gmail.com?subject=Tanya%20Proyek%20Website" class="inline-block px-8 py-4 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg shadow-purple-500/20">
+                        <button id="open-order-modal" type="button" class="inline-flex items-center gap-2 px-8 py-4 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg shadow-purple-500/20">
+                            <i class="ph ph-paper-plane-tilt"></i>
                             Pesan Sekarang
-                        </a>
+                        </button>
+                        <p class="text-xs text-gray-500 mt-3">Pilih jenis order, lalu data akan terkirim otomatis ke admin.</p>
                     </div>
                     <div class="hidden lg:block w-64 h-64 bg-purple-500/10 rounded-full border border-purple-500/20 animate-pulse flex items-center justify-center">
                         <i class="ph ph-shopping-cart text-8xl text-purple-400/50"></i>
@@ -276,9 +278,51 @@
             </div>
         </section>
 
+        <div id="order-modal" class="fixed inset-0 z-[120] hidden items-center justify-center px-4 bg-black/80 backdrop-blur-sm">
+            <div class="w-full max-w-2xl glass-panel rounded-3xl p-6 md:p-8 border border-white/10 relative">
+                <button id="close-order-modal" type="button" class="absolute right-4 top-4 text-gray-400 hover:text-white" aria-label="Tutup form order">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+                <h3 class="font-heading text-2xl font-bold mb-2">Form Order Proyek</h3>
+                <p class="text-sm text-gray-400 mb-6">Isi form berikut, pilih layanan, lalu kirim agar data order masuk ke admin.</p>
+                <form id="order-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div class="md:col-span-1">
+                        <label for="order-name" class="text-sm text-gray-300 block mb-2">Nama</label>
+                        <input id="order-name" name="name" type="text" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="Nama lengkap"/>
+                    </div>
+                    <div class="md:col-span-1">
+                        <label for="order-contact" class="text-sm text-gray-300 block mb-2">No. WhatsApp / Kontak</label>
+                        <input id="order-contact" name="contact" type="text" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="08xxxxxxxxxx"/>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="order-email" class="text-sm text-gray-300 block mb-2">Email</label>
+                        <input id="order-email" name="email" type="email" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="nama@email.com"/>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="order-type" class="text-sm text-gray-300 block mb-2">Pilih Jenis Order</label>
+                        <select id="order-type" name="orderType" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400">
+                            <option value="" disabled selected>Pilih layanan</option>
+                            <option value="Personal Portofolio Web">Personal Portofolio Web</option>
+                            <option value="Sistem Informasi Sekolah/Bisnis">Sistem Informasi Sekolah/Bisnis</option>
+                            <option value="Maintenance & Optimalisasi Web">Maintenance & Optimalisasi Web</option>
+                            <option value="Custom Request">Custom Request</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="order-note" class="text-sm text-gray-300 block mb-2">Detail Kebutuhan</label>
+                        <textarea id="order-note" name="message" rows="4" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="Ceritakan kebutuhan proyekmu..."></textarea>
+                    </div>
+                    <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
+                        <button id="submit-order" type="submit" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition">Kirim Order</button>
+                        <p id="order-status" class="text-sm text-gray-400"></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <footer id="contact" class="text-center pt-16 pb-10 border-t border-white/10">
             <h2 class="font-heading text-2xl font-bold mb-4">Let's work together</h2>
-            <a href="mailto:fikritri579@gmail.com?subject=Halo%20Fikri!&body=Saya%20tertarik%20untuk%20bekerja%20sama..." 
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fikritri579@gmail.com&su=Halo%20Fikri!&body=Saya%20tertarik%20untuk%20bekerja%20sama..." target="_blank" rel="noopener noreferrer" 
                class="text-2xl md:text-4xl font-bold text-gray-500 hover:text-white transition duration-300 border-b-2 border-transparent hover:border-purple-400 inline-block pb-1">
                fikritri579@gmail.com
             </a>
@@ -293,6 +337,28 @@
         const menuIconClose = document.getElementById('menu-icon-close');
         const mobileLinks = document.querySelectorAll('.mobile-link');
 
+        const openOrderModalBtn = document.getElementById('open-order-modal');
+        const closeOrderModalBtn = document.getElementById('close-order-modal');
+        const orderModal = document.getElementById('order-modal');
+        const orderForm = document.getElementById('order-form');
+        const orderStatus = document.getElementById('order-status');
+
+        // Ganti URL ini dengan Web App URL Google Apps Script yang terhubung ke Google Spreadsheet kamu.
+        const ORDER_WEB_APP_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE';
+
+        function setOrderModal(open) {
+            if (open) {
+                orderModal.classList.remove('hidden');
+                orderModal.classList.add('flex');
+                document.body.classList.add('overflow-hidden');
+            } else {
+                orderModal.classList.remove('flex');
+                orderModal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+
+
         function toggleMenu() {
             mobileMenu.classList.toggle('hidden');
             mobileMenu.classList.toggle('flex');
@@ -303,6 +369,57 @@
 
         menuToggle.addEventListener('click', toggleMenu);
         mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+
+        openOrderModalBtn.addEventListener('click', () => setOrderModal(true));
+        closeOrderModalBtn.addEventListener('click', () => setOrderModal(false));
+        orderModal.addEventListener('click', (event) => {
+            if (event.target === orderModal) setOrderModal(false);
+        });
+
+        orderForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!ORDER_WEB_APP_URL || ORDER_WEB_APP_URL.includes('PASTE_YOUR')) {
+                orderStatus.textContent = 'Isi dulu ORDER_WEB_APP_URL di script agar data bisa masuk ke spreadsheet.';
+                orderStatus.className = 'text-sm text-yellow-400';
+                return;
+            }
+
+            const submitButton = document.getElementById('submit-order');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Mengirim...';
+            orderStatus.textContent = 'Mengirim data order...';
+            orderStatus.className = 'text-sm text-gray-400';
+
+            const formData = new FormData(orderForm);
+            const payload = {
+                name: formData.get('name'),
+                contact: formData.get('contact'),
+                email: formData.get('email'),
+                orderType: formData.get('orderType'),
+                message: formData.get('message'),
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await fetch(ORDER_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                orderStatus.textContent = 'Order berhasil dikirim. Silakan cek spreadsheet kamu.';
+                orderStatus.className = 'text-sm text-green-400';
+                orderForm.reset();
+            } catch (error) {
+                orderStatus.textContent = 'Gagal mengirim order. Coba lagi sebentar.';
+                orderStatus.className = 'text-sm text-red-400';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Kirim Order';
+            }
+        });
 
         // Background Animation
         const canvasBg = document.getElementById('canvas-bg');
