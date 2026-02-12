@@ -775,10 +775,19 @@
         class Part {
             constructor() {
                 this.x = Math.random()*wP; this.y = Math.random()*hP; 
-                this.s = Math.random()*1.5; this.vy = Math.random()*0.5 + 0.1;
+                this.s = Math.random()*2.4 + 0.8; this.vy = Math.random()*0.6 + 0.2;
+                this.a = Math.random()*0.35 + 0.4;
             }
             update() { this.y -= this.vy; if(this.y < 0) this.y = hP; }
-            draw() { ctxP.fillStyle = `rgba(255,255,255,${Math.random()*0.5})`; ctxP.beginPath(); ctxP.arc(this.x, this.y, this.s, 0, Math.PI*2); ctxP.fill(); }
+            draw() {
+                ctxP.fillStyle = `rgba(255,255,255,${this.a})`;
+                ctxP.shadowBlur = 10;
+                ctxP.shadowColor = 'rgba(255,255,255,0.7)';
+                ctxP.beginPath();
+                ctxP.arc(this.x, this.y, this.s, 0, Math.PI*2);
+                ctxP.fill();
+                ctxP.shadowBlur = 0;
+            }
         }
         function initParts() { parts = Array(60).fill().map(() => new Part()); }
         function animateP() { ctxP.clearRect(0,0,wP,hP); parts.forEach(p=>{p.update();p.draw()}); requestAnimationFrame(animateP); }
