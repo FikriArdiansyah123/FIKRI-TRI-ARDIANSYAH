@@ -9,7 +9,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -21,12 +21,15 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         heading: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
                         dark: '#050505',
+                        brand: '#8b5cf6',
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         float: {
@@ -47,55 +50,115 @@
             overflow-x: hidden;
         }
 
-        #canvas-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -3;
-            filter: blur(80px);
-            opacity: 0.7;
+        /* --- BACKGROUND CANVAS --- */
+        #canvas-bg, #canvas-particles, #canvas-cursor {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+        }
+        #canvas-bg { z-index: -3; filter: blur(80px); opacity: 0.7; }
+        #canvas-particles { z-index: -2; opacity: 0.5; }
+        #canvas-cursor { z-index: 100; }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+        }
+        .loader-bar {
+            width: 200px; height: 4px; background: #333; border-radius: 2px; overflow: hidden; margin-top: 20px;
+        }
+        .loader-progress {
+            width: 0%; height: 100%; background: #8b5cf6; box-shadow: 0 0 10px #8b5cf6;
+            transition: width 0.2s;
+        }
+        .loader-text {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #8b5cf6; letter-spacing: 2px;
+            animation: blink 1s infinite;
         }
 
-        #canvas-particles {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -2;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-        /* FIXED: Z-index dinaikkan agar partikel muncul di atas konten di HP */
-        #canvas-cursor {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; 
-            pointer-events: none; /* Tetap bisa klik tombol di bawahnya */
-        }
-
+        /* --- GLASS PANEL & TILT --- */
         .glass-panel {
             background: rgba(20, 20, 20, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.1s ease-out, border-color 0.3s, background 0.3s, box-shadow 0.3s;
+            transform-style: preserve-3d;
         }
-
+        /* Efek Shine saat hover */
+        .glass-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1;
+        }
+        .glass-panel:hover::before { opacity: 1; }
         .glass-panel:hover {
             border-color: rgba(139, 92, 246, 0.4);
-            transform: translateY(-4px);
             background: rgba(30, 30, 30, 0.6);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px -10px rgba(139, 92, 246, 0.15);
         }
 
-        .text-glow { text-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+        /* --- SCROLL REVEAL CLASS --- */
+        .reveal {
+            opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- GLITCH EFFECT --- */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch { position: relative; color: white; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+        .glitch::before {
+            left: 2px; text-shadow: -1px 0 #00ffff; clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px; text-shadow: -1px 0 #ff00ff; clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 86px, 0); }
+            20% { clip: rect(89px, 9999px, 15px, 0); }
+            40% { clip: rect(25px, 9999px, 120px, 0); }
+            60% { clip: rect(67px, 9999px, 2px, 0); }
+            80% { clip: rect(4px, 9999px, 56px, 0); }
+            100% { clip: rect(98px, 9999px, 45px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            20% { clip: rect(10px, 9999px, 35px, 0); }
+            40% { clip: rect(120px, 9999px, 5px, 0); }
+            60% { clip: rect(45px, 9999px, 60px, 0); }
+            80% { clip: rect(2px, 9999px, 25px, 0); }
+            100% { clip: rect(80px, 9999px, 120px, 0); }
+        }
+        .text-glow { text-shadow: 0 0 20px rgba(139, 92, 246, 0.6); }
+
+        /* --- TYPING CURSOR --- */
+        .typing-cursor::after {
+            content: '|'; animation: blink 1s step-start infinite; color: #8b5cf6;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body class="antialiased selection:bg-purple-500/30">
+
+    <div id="preloader">
+        <div class="text-4xl font-bold font-heading mb-2 tracking-widest text-white">FTA<span class="text-purple-500">.</span></div>
+        <div class="loader-text">SYSTEM INITIALIZING...</div>
+        <div class="loader-bar">
+            <div class="loader-progress" id="loader-progress"></div>
+        </div>
+    </div>
 
     <canvas id="canvas-bg"></canvas> 
     <canvas id="canvas-particles"></canvas>
     <canvas id="canvas-cursor"></canvas> 
     
-    <nav class="fixed top-0 w-full z-[60] border-b border-white/5 bg-black/10 backdrop-blur-md">
+    <nav class="fixed top-0 w-full z-[60] border-b border-white/5 bg-black/10 backdrop-blur-md transition-all duration-300" id="navbar">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="font-heading font-bold text-xl tracking-wide hover:text-purple-400 transition z-50 relative">FTA.</a>
             
@@ -121,83 +184,85 @@
     </div>
 
     <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto relative z-10">
-        <section class="flex flex-col items-center text-center mb-24 animate-float">
-            <div class="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-900/10 text-purple-200 text-xs font-medium uppercase tracking-wider backdrop-blur-md">
+        
+        <section class="flex flex-col items-center text-center mb-24 min-h-[60vh] justify-center animate-float">
+            <div class="reveal mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-900/10 text-purple-200 text-xs font-medium uppercase tracking-wider backdrop-blur-md">
                 <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
                 Open for Projects
             </div>
 
-            <h1 class="font-heading text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+            <h1 class="reveal font-heading text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-[1.1]">
                 Fikri Tri<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 text-glow">Ardiansyah</span>
+                <div class="glitch-wrapper">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 text-glow glitch" data-text="Ardiansyah">Ardiansyah</span>
+                </div>
             </h1>
 
-            <p class="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
-                Membangun pengalaman web yang <span class="text-white font-semibold">modern & interaktif</span>. 
-                Menggabungkan estetika desain dengan kode yang presisi.
+            <p class="reveal text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-10 h-[60px] md:h-auto">
+                <span id="typewriter-text"></span><span class="typing-cursor"></span>
             </p>
 
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="#projects" class="px-8 py-3 bg-white text-black rounded-xl font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+            <div class="reveal flex flex-wrap justify-center gap-4">
+                <a href="#projects" class="px-8 py-3 bg-white text-black rounded-xl font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]">
                     Lihat Karya
                 </a>
-                <a href="https://github.com/FikriArdiansyah123" target="_blank" class="px-8 py-3 glass-panel rounded-xl font-bold flex items-center gap-2 hover:bg-white/10">
-                    <i class="ph ph-github-logo text-xl"></i> GitHub
+                <a href="https://github.com/FikriArdiansyah123" target="_blank" class="px-8 py-3 glass-panel rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 group">
+                    <i class="ph ph-github-logo text-xl group-hover:rotate-12 transition"></i> GitHub
                 </a>
             </div>
         </section>
 
         <section id="about" class="mb-32 pt-16">
-            <div class="flex items-center justify-between mb-8">
+            <div class="reveal flex items-center justify-between mb-8">
                 <h2 class="font-heading text-3xl font-bold">Dashboard</h2>
                 <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-5 md:auto-rows-[180px]">
                 
-                <div class="glass-panel md:col-span-2 md:row-span-2 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden group min-h-[320px] md:min-h-0">
-                    <div class="absolute top-0 right-0 p-24 bg-purple-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-600/30 transition"></div>
-                    <div>
-                        <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 text-purple-400 border border-white/5">
+                <div class="reveal glass-panel tilt-card md:col-span-2 md:row-span-2 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden group min-h-[320px] md:min-h-0">
+                    <div class="absolute top-0 right-0 p-24 bg-purple-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-600/30 transition duration-700"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 text-purple-400 border border-white/5 group-hover:scale-110 transition">
                             <i class="ph ph-user text-2xl"></i>
                         </div>
                         <h3 class="font-heading text-2xl font-bold mb-3">Tentang Saya</h3>
                         <p class="text-gray-400 leading-relaxed text-sm md:text-base">
-                            Halo! Saya Fikri. Saya merupakan penghafal Al-Qur’an 30 juz yang berkomitmen menjaga hafalan serta mengamalkan nilai-nilai Al-Qur’an dalam kehidupan. Saya bercita-cita menjadi IT Professional yang berintegritas dan mampu berkontribusi positif melalui pemanfaatan teknologi informasi bagi masyarakat..
+                            Halo! Saya Fikri. Saya merupakan penghafal Al-Qur’an 30 juz yang berkomitmen menjaga hafalan serta mengamalkan nilai-nilai Al-Qur’an dalam kehidupan. Saya bercita-cita menjadi IT Professional yang berintegritas.
                         </p>
                     </div>
-                    <div class="flex gap-2 mt-6">
-                        <span class="px-3 py-1 bg-white/5 rounded-lg text-xs font-medium text-gray-300 border border-white/5">Frontend</span>
-                        <span class="px-3 py-1 bg-white/5 rounded-lg text-xs font-medium text-gray-300 border border-white/5">UI Design</span>
+                    <div class="flex gap-2 mt-6 relative z-10">
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-xs font-medium text-gray-300 border border-white/5 hover:border-purple-400 transition">Frontend</span>
+                        <span class="px-3 py-1 bg-white/5 rounded-lg text-xs font-medium text-gray-300 border border-white/5 hover:border-purple-400 transition">UI Design</span>
                     </div>
                 </div>
 
-                <div class="glass-panel md:col-span-1 md:row-span-2 rounded-3xl p-6 flex flex-col min-h-[250px] md:min-h-0">
+                <div class="reveal glass-panel tilt-card md:col-span-1 md:row-span-2 rounded-3xl p-6 flex flex-col min-h-[250px] md:min-h-0">
                     <h3 class="font-heading text-lg font-bold mb-6 text-gray-200">Hobby</h3>
                     <div class="flex flex-col gap-3 flex-1 justify-center">
-                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5 hover:translate-x-2">
                             <i class="ph ph-atom text-cyan-400 text-xl"></i> <span class="text-sm font-medium">Reading</span>
                         </div>
-                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5 hover:translate-x-2">
                             <i class="ph ph-paint-brush-broad text-blue-400 text-xl"></i> <span class="text-sm font-medium">Murojaah</span>
                         </div>
-                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5 hover:translate-x-2">
                             <i class="ph ph-file-ts text-blue-600 text-xl"></i> <span class="text-sm font-medium">Futsal</span>
                         </div>
-                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5">
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/5 hover:translate-x-2">
                             <i class="ph ph-figma-logo text-pink-400 text-xl"></i> <span class="text-sm font-medium">Badminton</span>
                         </div>
                     </div>
                 </div>
 
-                <a href="https://www.instagram.com/f_t_fta/" target="_blank" class="glass-panel rounded-3xl p-6 flex items-center justify-between cursor-pointer group min-h-[100px] md:min-h-0">
+                <a href="https://www.instagram.com/f_t_fta/" target="_blank" class="reveal glass-panel tilt-card rounded-3xl p-6 flex items-center justify-between cursor-pointer group min-h-[100px] md:min-h-0">
                     <div>
                         <p class="text-gray-500 text-xs uppercase tracking-widest font-bold">Connect</p>
-                        <p class="font-heading text-xl font-bold text-white group-hover:text-blue-400 transition">Instagram</p>
+                        <p class="font-heading text-xl font-bold text-white group-hover:text-pink-500 transition">Instagram</p>
                     </div>
-                    <i class="ph ph-arrow-up-right text-gray-500 group-hover:text-white transition"></i>
+                    <i class="ph ph-arrow-up-right text-gray-500 group-hover:text-white group-hover:-translate-y-1 group-hover:translate-x-1 transition"></i>
                 </a>
                 
-                <a href="https://maps.app.goo.gl/hdWu2iSAhWhkayo67" target="_blank" class="glass-panel rounded-3xl p-6 flex flex-col justify-center relative overflow-hidden group min-h-[100px] md:min-h-0">
+                <a href="https://maps.app.goo.gl/hdWu2iSAhWhkayo67" target="_blank" class="reveal glass-panel tilt-card rounded-3xl p-6 flex flex-col justify-center relative overflow-hidden group min-h-[100px] md:min-h-0">
                     <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent transition-opacity group-hover:opacity-40"></div>
                     <p class="text-gray-400 text-xs relative z-10 uppercase tracking-widest font-bold">Location</p>
                     <div class="flex items-center gap-2 relative z-10 mt-1">
@@ -209,41 +274,41 @@
         </section>
 
         <section id="projects" class="mb-32 pt-16">
-            <div class="flex items-center justify-between mb-8">
+            <div class="reveal flex items-center justify-between mb-8">
                 <h2 class="font-heading text-3xl font-bold">Featured Projects</h2>
                 <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <a href="https://fikriardiansyah123.github.io/VANDSTAVOR-ALBUM/" target="_blank" class="glass-panel rounded-3xl overflow-hidden group block">
+                <a href="https://fikriardiansyah123.github.io/VANDSTAVOR-ALBUM/" target="_blank" class="reveal glass-panel tilt-card rounded-3xl overflow-hidden group block">
                     <div class="h-64 relative overflow-hidden bg-gray-900">
-                        <img src="https://i.ibb.co.com/99bP0T7m/Screenshot-80.png" alt="Timeless Memories Book" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-700 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                        <div class="absolute bottom-6 left-8">
-                            <span class="font-heading text-2xl font-bold">Timeless Memories Book</span>
+                        <img src="https://i.ibb.co.com/99bP0T7m/Screenshot-80.png" alt="Timeless Memories Book" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+                        <div class="absolute bottom-6 left-8 transform translate-y-2 group-hover:translate-y-0 transition duration-300">
+                            <span class="font-heading text-2xl font-bold text-white">Timeless Memories Book</span>
                         </div>
                     </div>
                     <div class="p-8">
-                        <p class="text-gray-400 text-sm mb-4">Platform digital untuk mengabadikan setiap momen berharga dalam bentuk jurnal interaktif yang elegan.</p>
+                        <p class="text-gray-400 text-sm mb-4 group-hover:text-gray-300 transition">Platform digital untuk mengabadikan setiap momen berharga dalam bentuk jurnal interaktif yang elegan.</p>
                         <div class="flex gap-2">
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Static</span>
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Landing</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300 group-hover:border-purple-500/50 transition">Static</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300 group-hover:border-purple-500/50 transition">Landing</span>
                         </div>
                     </div>
                 </a>
 
-                <a href="https://fikriardiansyah123.github.io/Presensi-Mahasiswa/" target="_blank" class="glass-panel rounded-3xl overflow-hidden group block">
+                <a href="https://fikriardiansyah123.github.io/Presensi-Mahasiswa/" target="_blank" class="reveal glass-panel tilt-card rounded-3xl overflow-hidden group block">
                     <div class="h-64 relative overflow-hidden bg-gray-900">
-                        <img src="https://i.ibb.co.com/x8rBq8LZ/Screenshot-86-1.png" alt="Student Presence" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition duration-700 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                        <div class="absolute bottom-6 left-8">
-                            <span class="font-heading text-2xl font-bold">Student Presence</span>
+                        <img src="https://i.ibb.co.com/x8rBq8LZ/Screenshot-86-1.png" alt="Student Presence" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"></div>
+                        <div class="absolute bottom-6 left-8 transform translate-y-2 group-hover:translate-y-0 transition duration-300">
+                            <span class="font-heading text-2xl font-bold text-white">Student Presence</span>
                         </div>
                     </div>
                     <div class="p-8">
-                        <p class="text-gray-400 text-sm mb-4">Sistem manajemen kehadiran siswa berbasis web yang efisien, memudahkan pemantauan kehadiran secara real-time.</p>
+                        <p class="text-gray-400 text-sm mb-4 group-hover:text-gray-300 transition">Sistem manajemen kehadiran siswa berbasis web yang efisien, memudahkan pemantauan kehadiran.</p>
                         <div class="flex gap-2">
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Cloud API</span>
-                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300">Frontend</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300 group-hover:border-purple-500/50 transition">Cloud API</span>
+                            <span class="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded text-gray-300 group-hover:border-purple-500/50 transition">Frontend</span>
                         </div>
                     </div>
                 </a>
@@ -251,310 +316,496 @@
         </section>
 
         <section id="orders" class="mb-32 pt-16">
-            <div class="flex items-center justify-between mb-8">
+            <div class="reveal flex items-center justify-between mb-8">
                 <h2 class="font-heading text-3xl font-bold">Orders</h2>
                 <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
             </div>
-            <div class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden">
+            <div class="reveal glass-panel tilt-card rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] animate-pulse-slow"></div>
                 <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
                     <div class="flex-1 text-center md:text-left">
                         <h3 class="font-heading text-2xl md:text-3xl font-bold mb-4">Mulai Proyek Impianmu Sekarang</h3>
-                        <p class="text-gray-400 leading-relaxed mb-8">Saya menerima pesanan pembuatan website kustom, desain antarmuka (UI/UX), hingga sistem manajemen data. Setiap proyek dikerjakan dengan standar kualitas tinggi dan presisi.</p>
+                        <p class="text-gray-400 leading-relaxed mb-8">Saya menerima pesanan pembuatan website kustom, desain antarmuka (UI/UX), hingga sistem manajemen data. Kualitas tinggi, presisi, dan modern.</p>
                         <ul class="space-y-4 mb-8 inline-block text-left">
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Personal Portofolio Web</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Sistem Informasi Sekolah/Bisnis</li>
-                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Maintenance & Optimalisasi Web</li>
+                            <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Maintenance & Optimalisasi</li>
                         </ul><br>
-                        <button id="open-order-modal" type="button" class="inline-flex items-center gap-2 px-8 py-4 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg shadow-purple-500/20">
-                            <i class="ph ph-paper-plane-tilt"></i>
+                        <button id="open-order-modal" type="button" class="group inline-flex items-center gap-2 px-8 py-4 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transform hover:-translate-y-1">
+                            <i class="ph ph-paper-plane-tilt group-hover:translate-x-1 transition"></i>
                             Pesan Sekarang
                         </button>
-                        <p class="text-xs text-gray-500 mt-3">Pilih jenis order, lalu data akan terkirim otomatis ke admin.</p>
                     </div>
-                    <div class="hidden lg:block w-64 h-64 bg-purple-500/10 rounded-full border border-purple-500/20 animate-pulse flex items-center justify-center">
-                        <i class="ph ph-shopping-cart text-8xl text-purple-400/50"></i>
+                    <div class="hidden lg:block w-64 h-64 bg-purple-500/5 rounded-full border border-purple-500/20 flex items-center justify-center relative">
+                        <div class="absolute inset-0 border border-purple-400/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                        <i class="ph ph-shopping-cart text-8xl text-purple-400/80 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"></i>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div id="order-modal" class="fixed inset-0 z-[120] hidden items-center justify-center px-4 bg-black/80 backdrop-blur-sm">
-            <div class="w-full max-w-2xl glass-panel rounded-3xl p-6 md:p-8 border border-white/10 relative">
-                <button id="close-order-modal" type="button" class="absolute right-4 top-4 text-gray-400 hover:text-white" aria-label="Tutup form order">
+        <div id="order-modal" class="fixed inset-0 z-[120] hidden items-center justify-center px-4 bg-black/80 backdrop-blur-md opacity-0 transition-opacity duration-300">
+            <div class="w-full max-w-2xl glass-panel rounded-3xl p-6 md:p-8 border border-white/10 relative transform scale-95 transition-transform duration-300" id="order-modal-content">
+                <button id="close-order-modal" type="button" class="absolute right-4 top-4 text-gray-400 hover:text-white transition hover:rotate-90" aria-label="Tutup">
                     <i class="ph ph-x text-2xl"></i>
                 </button>
                 <h3 class="font-heading text-2xl font-bold mb-2">Form Order Proyek</h3>
-                <p class="text-sm text-gray-400 mb-6">Isi form berikut, pilih layanan, lalu kirim agar data order masuk ke admin.</p>
+                <p class="text-sm text-gray-400 mb-6">Silakan lengkapi data berikut untuk memulai kerjasama.</p>
                 <form id="order-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                    <div class="md:col-span-1">
-                        <label for="order-name" class="text-sm text-gray-300 block mb-2">Nama</label>
-                        <input id="order-name" name="name" type="text" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="Nama lengkap"/>
+                    <div id="order-step-1" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300">
+                        <div class="md:col-span-1">
+                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Nama</label>
+                            <input id="order-name" name="name" type="text" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="Nama lengkap"/>
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">WhatsApp</label>
+                            <input id="order-contact" name="contact" type="text" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="08xxxxxxxxxx"/>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Email</label>
+                            <input id="order-email" name="email" type="email" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="nama@email.com"/>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Jenis Layanan</label>
+                            <div class="relative">
+                                <select id="order-type" name="orderType" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 appearance-none text-gray-300">
+                                    <option value="" disabled selected>Pilih layanan...</option>
+                                    <option value="Personal Portofolio Web">Personal Portofolio Web</option>
+                                    <option value="Sistem Informasi Sekolah/Bisnis">Sistem Informasi Sekolah/Bisnis</option>
+                                    <option value="Maintenance & Optimalisasi Web">Maintenance & Optimalisasi Web</option>
+                                    <option value="Custom Request">Custom Request</option>
+                                </select>
+                                <i class="ph ph-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Detail Project</label>
+                            <textarea id="order-note" name="message" rows="3" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="Ceritakan ide atau kebutuhanmu..."></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
+                            <button id="next-to-payment" type="button" class="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition flex justify-center items-center gap-2">Lanjut Pembayaran <i class="ph ph-arrow-right"></i></button>
+                            <p id="order-status" class="text-sm text-gray-400"></p>
+                        </div>
                     </div>
-                    <div class="md:col-span-1">
-                        <label for="order-contact" class="text-sm text-gray-300 block mb-2">No. WhatsApp / Kontak</label>
-                        <input id="order-contact" name="contact" type="text" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="08xxxxxxxxxx"/>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="order-email" class="text-sm text-gray-300 block mb-2">Email</label>
-                        <input id="order-email" name="email" type="email" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="nama@email.com"/>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="order-type" class="text-sm text-gray-300 block mb-2">Pilih Jenis Order</label>
-                        <select id="order-type" name="orderType" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400">
-                            <option value="" disabled selected>Pilih layanan</option>
-                            <option value="Personal Portofolio Web">Personal Portofolio Web</option>
-                            <option value="Sistem Informasi Sekolah/Bisnis">Sistem Informasi Sekolah/Bisnis</option>
-                            <option value="Maintenance & Optimalisasi Web">Maintenance & Optimalisasi Web</option>
-                            <option value="Custom Request">Custom Request</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="order-note" class="text-sm text-gray-300 block mb-2">Detail Kebutuhan</label>
-                        <textarea id="order-note" name="message" rows="4" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-purple-400" placeholder="Ceritakan kebutuhan proyekmu..."></textarea>
-                    </div>
-                    <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
-                        <button id="submit-order" type="submit" class="px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition">Kirim Order</button>
-                        <p id="order-status" class="text-sm text-gray-400"></p>
+
+                    <div id="order-step-2" class="md:col-span-2 hidden transition-all duration-300">
+                        <div id="payment-section" class="mt-1 p-5 rounded-2xl border border-dashed border-purple-400/30 bg-purple-900/5">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="w-6 h-6 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs font-bold">2</span>
+                                <p class="text-sm text-purple-200 font-semibold">Scan QRIS & Upload Bukti</p>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row gap-5">
+                                <div class="w-full sm:w-1/3">
+                                    <a id="qris-image-link" href="#" target="_blank" class="block rounded-xl overflow-hidden border border-white/10 hover:border-purple-400 transition group relative">
+                                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                            <i class="ph ph-magnifying-glass-plus text-2xl"></i>
+                                        </div>
+                                        <img id="qris-image-preview" src="https://placehold.co/600x600/111111/8b5cf6?text=QRIS+Loading..." alt="QRIS" class="w-full aspect-square object-cover">
+                                    </a>
+                                </div>
+                                <div class="flex-1 space-y-4">
+                                    <div>
+                                        <label class="block text-xs text-gray-400 mb-2">Upload Bukti Transfer</label>
+                                        <label class="flex flex-col items-center justify-center w-full h-24 border border-white/10 border-dashed rounded-xl cursor-pointer hover:bg-white/5 transition bg-black/20">
+                                            <div class="flex flex-col items-center justify-center pt-2 pb-3">
+                                                <i class="ph ph-upload-simple text-gray-400 text-xl mb-1"></i>
+                                                <p class="text-xs text-gray-400">Klik untuk upload gambar</p>
+                                            </div>
+                                            <input id="payment-proof" name="paymentProof" type="file" accept="image/*" required class="hidden" />
+                                        </label>
+                                        <div id="file-name-display" class="text-xs text-purple-400 mt-2 truncate hidden"></div>
+                                        <img id="payment-proof-preview" class="hidden mt-2 w-full max-h-32 object-contain rounded-lg border border-white/10 bg-black" />
+                                    </div>
+                                    
+                                    <label class="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition">
+                                        <input id="payment-confirm" name="paymentConfirmed" type="checkbox" class="mt-1 w-4 h-4 accent-purple-500 rounded" required>
+                                        <span class="text-xs text-gray-300 leading-snug">Saya menyatakan telah melakukan pembayaran sesuai nominal yang disepakati.</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                            <button id="back-to-details" type="button" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-bold transition text-gray-300">Kembali</button>
+                            <button id="submit-order" type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-bold transition shadow-lg shadow-purple-900/20 text-white flex justify-center items-center gap-2">
+                                <i class="ph ph-paper-plane-right"></i> Kirim Order
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <footer id="contact" class="text-center pt-16 pb-10 border-t border-white/10">
-            <h2 class="font-heading text-2xl font-bold mb-4">Let's work together</h2>
+        <footer id="contact" class="text-center pt-16 pb-10 border-t border-white/10 mt-20 relative">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50 blur-sm"></div>
+            <h2 class="reveal font-heading text-2xl font-bold mb-4">Let's work together</h2>
             <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fikritri579@gmail.com&su=Halo%20Fikri!&body=Saya%20tertarik%20untuk%20bekerja%20sama..." target="_blank" rel="noopener noreferrer" 
-               class="text-2xl md:text-4xl font-bold text-gray-500 hover:text-white transition duration-300 border-b-2 border-transparent hover:border-purple-400 inline-block pb-1">
+               class="reveal text-2xl md:text-4xl font-bold text-gray-500 hover:text-white transition duration-300 border-b-2 border-transparent hover:border-purple-400 inline-block pb-1 hover:tracking-wide">
                fikritri579@gmail.com
             </a>
-            <p class="mt-8 text-sm text-gray-600">© 2026 Fikri Tri Ardiansyah. All rights reserved.</p>
+            <p class="reveal mt-8 text-sm text-gray-600">© 2026 Fikri Tri Ardiansyah. Code with ❤️ & ☕</p>
         </footer>
     </main>
 
     <script>
+        /* --- CONFIGURATION --- */
+        // Masukkan URL Google Apps Script di bawah ini
+        const ORDER_WEB_APP_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE';
+        // Masukkan URL Gambar QRIS (Direct Link) di bawah ini
+        const QRIS_IMAGE_URL = 'PASTE_YOUR_QRIS_IMAGE_URL_HERE';
+
+
+        /* --- PRELOADER LOGIC --- */
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            const progress = document.getElementById('loader-progress');
+            
+            // Animasi loading bar
+            progress.style.width = '100%';
+            
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                
+                // Mulai scroll animation setelah loading selesai
+                initScrollReveal();
+                typeWriterEffect();
+            }, 1500); // Durasi loading palsu (1.5 detik)
+        });
+
+        /* --- TYPEWRITER EFFECT --- */
+        function typeWriterEffect() {
+            const textElement = document.getElementById('typewriter-text');
+            const text = "Membangun pengalaman web yang modern & interaktif. Menggabungkan estetika desain dengan kode yang presisi.";
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    textElement.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 30); // Kecepatan mengetik
+                }
+            }
+            type();
+        }
+
+        /* --- SCROLL REVEAL (INTERSECTION OBSERVER) --- */
+        function initScrollReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target); // Hanya animasi sekali
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            reveals.forEach(el => observer.observe(el));
+        }
+
+        /* --- 3D TILT EFFECT (LIGHTWEIGHT CUSTOM SCRIPT) --- */
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x position within the element.
+                const y = e.clientY - rect.top;  // y position within the element.
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -5; // Max rotation deg
+                const rotateY = ((x - centerX) / centerX) * 5;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
+            });
+        });
+
+
+        /* --- LOGIC UTAMA (SAMA SEPERTI SEBELUMNYA) --- */
         const menuToggle = document.getElementById('menu-toggle');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuIconOpen = document.getElementById('menu-icon-open');
         const menuIconClose = document.getElementById('menu-icon-close');
         const mobileLinks = document.querySelectorAll('.mobile-link');
+        const navbar = document.getElementById('navbar');
 
-        const openOrderModalBtn = document.getElementById('open-order-modal');
-        const closeOrderModalBtn = document.getElementById('close-order-modal');
-        const orderModal = document.getElementById('order-modal');
-        const orderForm = document.getElementById('order-form');
-        const orderStatus = document.getElementById('order-status');
-
-        // Ganti URL ini dengan Web App URL Google Apps Script yang terhubung ke Google Spreadsheet kamu.
-        const ORDER_WEB_APP_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE';
-
-        function setOrderModal(open) {
-            if (open) {
-                orderModal.classList.remove('hidden');
-                orderModal.classList.add('flex');
-                document.body.classList.add('overflow-hidden');
+        // Navbar Blur on Scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-black/60', 'shadow-lg');
             } else {
-                orderModal.classList.remove('flex');
-                orderModal.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
+                navbar.classList.remove('bg-black/60', 'shadow-lg');
             }
-        }
-
+        });
 
         function toggleMenu() {
-            mobileMenu.classList.toggle('hidden');
-            mobileMenu.classList.toggle('flex');
-            menuIconOpen.classList.toggle('hidden');
-            menuIconClose.classList.toggle('hidden');
-            document.body.classList.toggle('overflow-hidden');
+            const isHidden = mobileMenu.classList.contains('hidden');
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+                menuIconOpen.classList.add('hidden');
+                menuIconClose.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            } else {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+                menuIconOpen.classList.remove('hidden');
+                menuIconClose.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
         }
 
         menuToggle.addEventListener('click', toggleMenu);
         mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
 
+
+        /* --- ORDER FORM LOGIC --- */
+        const orderModal = document.getElementById('order-modal');
+        const orderModalContent = document.getElementById('order-modal-content');
+        const openOrderModalBtn = document.getElementById('open-order-modal');
+        const closeOrderModalBtn = document.getElementById('close-order-modal');
+        const orderForm = document.getElementById('order-form');
+        const stepOne = document.getElementById('order-step-1');
+        const stepTwo = document.getElementById('order-step-2');
+        const nextToPaymentBtn = document.getElementById('next-to-payment');
+        const backToDetailsBtn = document.getElementById('back-to-details');
+        const paymentProofInput = document.getElementById('payment-proof');
+        const paymentProofPreview = document.getElementById('payment-proof-preview');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const orderStatus = document.getElementById('order-status');
+
+        function setOrderModal(open) {
+            if (open) {
+                orderModal.classList.remove('hidden');
+                orderModal.classList.add('flex');
+                // Small delay for animation
+                setTimeout(() => {
+                    orderModal.classList.remove('opacity-0');
+                    orderModalContent.classList.remove('scale-95');
+                    orderModalContent.classList.add('scale-100');
+                }, 10);
+                document.body.classList.add('overflow-hidden');
+                
+                // Setup QRIS
+                if (QRIS_IMAGE_URL && !QRIS_IMAGE_URL.includes('PASTE_YOUR')) {
+                    document.getElementById('qris-image-preview').src = QRIS_IMAGE_URL;
+                    document.getElementById('qris-image-link').href = QRIS_IMAGE_URL;
+                }
+            } else {
+                orderModal.classList.add('opacity-0');
+                orderModalContent.classList.remove('scale-100');
+                orderModalContent.classList.add('scale-95');
+                setTimeout(() => {
+                    orderModal.classList.remove('flex');
+                    orderModal.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }, 300);
+            }
+        }
+
         openOrderModalBtn.addEventListener('click', () => setOrderModal(true));
         closeOrderModalBtn.addEventListener('click', () => setOrderModal(false));
-        orderModal.addEventListener('click', (event) => {
-            if (event.target === orderModal) setOrderModal(false);
+        
+        // Step Navigation
+        nextToPaymentBtn.addEventListener('click', () => {
+            const inputs = stepOne.querySelectorAll('input, select, textarea');
+            let valid = true;
+            inputs.forEach(input => {
+                if(!input.checkValidity()) { valid = false; input.reportValidity(); }
+            });
+
+            if(valid) {
+                stepOne.classList.add('hidden');
+                stepTwo.classList.remove('hidden');
+                orderStatus.textContent = '';
+            } else {
+                orderStatus.textContent = 'Mohon lengkapi data di atas.';
+                orderStatus.className = 'text-sm text-red-400';
+            }
         });
 
-        orderForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        backToDetailsBtn.addEventListener('click', () => {
+            stepOne.classList.remove('hidden');
+            stepTwo.classList.add('hidden');
+        });
 
+        // File Input Preview
+        paymentProofInput.addEventListener('change', () => {
+            const file = paymentProofInput.files[0];
+            if (file) {
+                fileNameDisplay.textContent = file.name;
+                fileNameDisplay.classList.remove('hidden');
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    paymentProofPreview.src = e.target.result;
+                    paymentProofPreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Submit Logic
+        async function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        orderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submit-order');
+            
             if (!ORDER_WEB_APP_URL || ORDER_WEB_APP_URL.includes('PASTE_YOUR')) {
-                orderStatus.textContent = 'Isi dulu ORDER_WEB_APP_URL di script agar data bisa masuk ke spreadsheet.';
-                orderStatus.className = 'text-sm text-yellow-400';
+                alert("URL Google Apps Script belum disetting!");
                 return;
             }
 
-            const submitButton = document.getElementById('submit-order');
-            submitButton.disabled = true;
-            submitButton.textContent = 'Mengirim...';
-            orderStatus.textContent = 'Mengirim data order...';
-            orderStatus.className = 'text-sm text-gray-400';
-
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Mengirim...';
+            
             const formData = new FormData(orderForm);
-            const payload = {
-                name: formData.get('name'),
-                contact: formData.get('contact'),
-                email: formData.get('email'),
-                orderType: formData.get('orderType'),
-                message: formData.get('message'),
-                createdAt: new Date().toISOString()
-            };
-
+            const file = paymentProofInput.files[0];
+            
             try {
+                const base64File = await fileToDataUrl(file);
+                
+                const payload = {
+                    name: formData.get('name'),
+                    contact: formData.get('contact'),
+                    email: formData.get('email'),
+                    orderType: formData.get('orderType'),
+                    message: formData.get('message'),
+                    paymentConfirmed: true,
+                    paymentProofName: file.name,
+                    paymentProofDataUrl: base64File,
+                    createdAt: new Date().toISOString()
+                };
+
                 await fetch(ORDER_WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'cors',
+                    mode: 'no-cors', // Penting untuk Google Scripts simple trigger
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                orderStatus.textContent = 'Order berhasil dikirim. Silakan cek spreadsheet kamu.';
-                orderStatus.className = 'text-sm text-green-400';
-                orderForm.reset();
-            } catch (error) {
-                orderStatus.textContent = 'Gagal mengirim order. Coba lagi sebentar.';
-                orderStatus.className = 'text-sm text-red-400';
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Kirim Order';
+                // Karena mode no-cors, kita asumsikan berhasil jika tidak ada error network
+                submitBtn.innerHTML = '<i class="ph ph-check"></i> Terkirim!';
+                submitBtn.classList.remove('from-purple-600', 'to-blue-600');
+                submitBtn.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    alert("Order berhasil dikirim! Admin akan menghubungi Anda via WhatsApp.");
+                    setOrderModal(false);
+                    orderForm.reset();
+                    stepOne.classList.remove('hidden');
+                    stepTwo.classList.add('hidden');
+                    paymentProofPreview.classList.add('hidden');
+                    fileNameDisplay.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="ph ph-paper-plane-right"></i> Kirim Order';
+                    submitBtn.classList.add('from-purple-600', 'to-blue-600');
+                    submitBtn.classList.remove('bg-green-600');
+                }, 2000);
+
+            } catch (err) {
+                console.error(err);
+                alert("Gagal mengirim order. Silakan coba lagi.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kirim Order';
             }
         });
 
-        // Background Animation
+
+        /* --- CANVAS ANIMATION (BACKGROUND) --- */
         const canvasBg = document.getElementById('canvas-bg');
         const ctxBg = canvasBg.getContext('2d');
-        let widthBg, heightBg, orbs = [];
-        const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let wBg, hBg, orbs = [];
+        const mouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
 
-        function resizeBg() {
-            widthBg = window.innerWidth; heightBg = window.innerHeight;
-            canvasBg.width = widthBg; canvasBg.height = heightBg;
-            initBg();
-        }
+        function resizeBg() { wBg = canvasBg.width = window.innerWidth; hBg = canvasBg.height = window.innerHeight; initOrbs(); }
         window.addEventListener('resize', resizeBg);
-        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        window.addEventListener('touchmove', (e) => { 
-            if(e.touches.length > 0) {
-                mouse.x = e.touches[0].clientX; 
-                mouse.y = e.touches[0].clientY; 
-            }
-        });
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY });
 
         class Orb {
-            constructor(color, size, speed, offset) {
-                this.x = Math.random() * widthBg; this.y = Math.random() * heightBg;
-                this.color = color; this.size = size; this.speed = speed; this.offset = offset;
-                this.time = Math.random() * 100;
+            constructor(color, r, speed) {
+                this.r = r; this.color = color; this.speed = speed;
+                this.x = Math.random() * wBg; this.y = Math.random() * hBg;
+                this.t = Math.random() * 100;
             }
             update() {
-                this.time += 0.005;
-                const floatX = Math.sin(this.time + this.offset) * 150;
-                const floatY = Math.cos(this.time * 0.8 + this.offset) * 150;
-                this.x += (mouse.x + floatX - this.x) * this.speed;
-                this.y += (mouse.y + floatY - this.y) * this.speed;
+                this.t += 0.005;
+                this.x += (mouse.x - this.x) * this.speed * 0.5 + Math.sin(this.t) * 2;
+                this.y += (mouse.y - this.y) * this.speed * 0.5 + Math.cos(this.t) * 2;
             }
             draw() {
-                ctxBg.beginPath();
-                const gradient = ctxBg.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                gradient.addColorStop(0, this.color); gradient.addColorStop(1, 'rgba(0,0,0,0)');
-                ctxBg.fillStyle = gradient; ctxBg.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctxBg.fill();
+                const g = ctxBg.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+                g.addColorStop(0, this.color); g.addColorStop(1, 'rgba(0,0,0,0)');
+                ctxBg.fillStyle = g; ctxBg.beginPath(); ctxBg.arc(this.x, this.y, this.r, 0, Math.PI*2); ctxBg.fill();
             }
         }
-        function initBg() {
-            orbs = [
-                new Orb('rgba(124, 58, 237, 0.45)', Math.max(widthBg, heightBg) * 0.4, 0.02, 0),
-                new Orb('rgba(59, 130, 246, 0.35)', Math.max(widthBg, heightBg) * 0.35, 0.015, 2),
-                new Orb('rgba(45, 212, 191, 0.3)', Math.max(widthBg, heightBg) * 0.3, 0.01, 4)
-            ];
-        }
+        function initOrbs() { orbs = [new Orb('rgba(139, 92, 246, 0.4)', wBg*0.4, 0.03), new Orb('rgba(59, 130, 246, 0.3)', wBg*0.3, 0.02)]; }
         function animateBg() {
-            ctxBg.clearRect(0, 0, widthBg, heightBg);
-            ctxBg.globalCompositeOperation = 'screen';
-            orbs.forEach(orb => { orb.update(); orb.draw(); });
+            ctxBg.clearRect(0,0,wBg,hBg); ctxBg.globalCompositeOperation = 'screen';
+            orbs.forEach(o => { o.update(); o.draw(); });
             requestAnimationFrame(animateBg);
         }
         resizeBg(); animateBg();
 
-        // Particle Static
+        /* --- CANVAS PARTICLES --- */
         const canvasP = document.getElementById('canvas-particles');
         const ctxP = canvasP.getContext('2d');
-        let widthP, heightP, particles = [];
-        function resizeP() {
-            widthP = window.innerWidth; heightP = window.innerHeight;
-            canvasP.width = widthP; canvasP.height = heightP;
-            initParticles();
-        }
-        window.addEventListener('resize', resizeP);
-        class Particle {
+        let wP, hP, parts = [];
+        
+        function resizeP() { wP = canvasP.width = window.innerWidth; hP = canvasP.height = window.innerHeight; initParts(); }
+        class Part {
             constructor() {
-                this.x = Math.random() * widthP; this.y = Math.random() * heightP;
-                this.size = Math.random() * 1.5 + 0.5; this.speedY = Math.random() * 0.5 + 0.2;
-                this.opacity = Math.random() * 0.5 + 0.2;
+                this.x = Math.random()*wP; this.y = Math.random()*hP; 
+                this.s = Math.random()*1.5; this.vy = Math.random()*0.5 + 0.1;
             }
-            update() { this.y -= this.speedY; if (this.y < 0) this.y = heightP; }
-            draw() { ctxP.beginPath(); ctxP.fillStyle = `rgba(255, 255, 255, ${this.opacity})`; ctxP.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctxP.fill(); }
+            update() { this.y -= this.vy; if(this.y < 0) this.y = hP; }
+            draw() { ctxP.fillStyle = `rgba(255,255,255,${Math.random()*0.5})`; ctxP.beginPath(); ctxP.arc(this.x, this.y, this.s, 0, Math.PI*2); ctxP.fill(); }
         }
-        function initParticles() {
-            particles = []; for (let i = 0; i < 60; i++) particles.push(new Particle());
-        }
-        function animateParticles() {
-            ctxP.clearRect(0, 0, widthP, heightP);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        resizeP(); animateParticles();
+        function initParts() { parts = Array(60).fill().map(() => new Part()); }
+        function animateP() { ctxP.clearRect(0,0,wP,hP); parts.forEach(p=>{p.update();p.draw()}); requestAnimationFrame(animateP); }
+        window.addEventListener('resize', resizeP); resizeP(); animateP();
 
-        // CURSOR SPARKS (FIXED FOR MOBILE VISIBILITY)
+        /* --- CANVAS CURSOR --- */
         const canvasC = document.getElementById('canvas-cursor');
         const ctxC = canvasC.getContext('2d');
-        let widthC, heightC, cursorParticles = [];
-        const colors = ['#a855f7', '#3b82f6', '#2dd4bf', '#ffffff']; 
-
-        function resizeC() { widthC = window.innerWidth; heightC = window.innerHeight; canvasC.width = widthC; canvasC.height = heightC; }
+        let wC, hC, sparks = [];
+        function resizeC() { wC = canvasC.width = window.innerWidth; hC = canvasC.height = window.innerHeight; }
+        class Spark {
+            constructor(x,y) {
+                this.x=x; this.y=y; this.v={x:(Math.random()-0.5)*5, y:(Math.random()-0.5)*5};
+                this.life=1; this.color = `hsl(${Math.random()*60 + 240}, 100%, 70%)`;
+            }
+            update() { this.x+=this.v.x; this.y+=this.v.y; this.life-=0.03; this.v.x*=0.95; this.v.y*=0.95; }
+            draw() { ctxC.globalAlpha=this.life; ctxC.fillStyle=this.color; ctxC.beginPath(); ctxC.arc(this.x,this.y,2,0,Math.PI*2); ctxC.fill(); }
+        }
         window.addEventListener('resize', resizeC); resizeC();
-
-        class CursorParticle {
-            constructor(x, y) {
-                this.x = x; this.y = y; this.vx = (Math.random() - 0.5) * 8; this.vy = (Math.random() - 0.5) * 8;
-                this.size = Math.random() * 5 + 2; // Ukuran sedikit diperbesar agar terlihat di HP
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.opacity = 1;
-            }
-            update() { this.x += this.vx; this.y += this.vy; this.opacity -= 0.02; this.size *= 0.95; }
-            draw() { 
-                ctxC.save(); 
-                ctxC.globalAlpha = this.opacity; 
-                ctxC.beginPath(); 
-                ctxC.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
-                ctxC.fillStyle = this.color; 
-                ctxC.fill(); 
-                ctxC.restore(); 
-            }
+        window.addEventListener('mousemove', e => { for(let i=0;i<3;i++) sparks.push(new Spark(e.clientX, e.clientY)); });
+        function animateC() {
+            ctxC.clearRect(0,0,wC,hC);
+            sparks.forEach((s,i) => { s.update(); s.draw(); if(s.life<=0) sparks.splice(i,1); });
+            requestAnimationFrame(animateC);
         }
+        animateC();
 
-        function createSparks(x, y) {
-            for (let i = 0; i < 4; i++) {
-                cursorParticles.push(new CursorParticle(x, y));
-            }
-        }
-
-        window.addEventListener('mousemove', (e) => { createSparks(e.clientX, e.clientY); });
-        window.addEventListener('touchmove', (e) => { 
-            if(e.touches.length > 0) {
-                createSparks(e.touches[0].clientX, e.touches[0].clientY);
-            }
-        }, { passive: true });
-
-        function animateCursor() {
-            ctxC.clearRect(0, 0, widthC, heightC);
-            for (let i = 0; i < cursorParticles.length; i++) {
-                cursorParticles[i].update(); cursorParticles[i].draw();
-                if (cursorParticles[i].opacity <= 0) { cursorParticles.splice(i, 1); i--; }
-            }
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
     </script>
 </body>
 </html>
