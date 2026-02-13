@@ -85,7 +85,6 @@
             transition: transform 0.1s ease-out, border-color 0.3s, background 0.3s, box-shadow 0.3s;
             transform-style: preserve-3d;
         }
-        /* Efek Shine saat hover */
         .glass-panel::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             border-radius: inherit;
@@ -142,6 +141,12 @@
             content: '|'; animation: blink 1s step-start infinite; color: #8b5cf6;
         }
         @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- MODAL SCROLLBAR CUSTOM --- */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.6); }
     </style>
 </head>
 <body class="antialiased selection:bg-purple-500/30">
@@ -344,96 +349,177 @@
             </div>
         </section>
 
+        <!-- MODAL FORM (RESPONSIVE & COMPACT) -->
         <div id="order-modal" class="fixed inset-0 z-[120] hidden items-center justify-center px-4 bg-black/80 backdrop-blur-md opacity-0 transition-opacity duration-300">
-            <div class="w-full max-w-lg md:max-w-xl glass-panel rounded-3xl p-5 md:p-6 border border-white/10 relative transform scale-95 transition-transform duration-300" id="order-modal-content">
-                <button id="close-order-modal" type="button" class="absolute right-4 top-4 text-gray-400 hover:text-white transition hover:rotate-90" aria-label="Tutup">
-                    <i class="ph ph-x text-2xl"></i>
-                </button>
-                <h3 class="font-heading text-xl md:text-2xl font-bold mb-2">Form Order Proyek</h3>
-                <p class="text-sm text-gray-400 mb-6">Silakan lengkapi data berikut untuk memulai kerjasama.</p>
-                <form id="order-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-left">
-                    <div id="order-step-1" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300">
-                        <div class="md:col-span-1">
-                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Nama</label>
-                            <input id="order-name" name="name" type="text" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="Nama lengkap"/>
-                        </div>
-                        <div class="md:col-span-1">
-                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">WhatsApp</label>
-                            <input id="order-contact" name="contact" type="text" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="08xxxxxxxxxx"/>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Email</label>
-                            <input id="order-email" name="email" type="email" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="nama@email.com"/>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Jenis Layanan</label>
-                            <div class="relative">
-                                <select id="order-type" name="orderType" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 appearance-none text-gray-300">
-                                    <option value="" disabled selected>Pilih layanan...</option>
-                                    <option value="Personal Portofolio Web">Personal Portofolio Web</option>
-                                    <option value="Sistem Informasi Sekolah/Bisnis">Sistem Informasi Sekolah/Bisnis</option>
-                                    <option value="Maintenance & Optimalisasi Web">Maintenance & Optimalisasi Web</option>
-                                    <option value="Custom Request">Custom Request</option>
-                                </select>
-                                <i class="ph ph-caret-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            </div>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2 block">Detail Project</label>
-                            <textarea id="order-note" name="message" rows="3" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition" placeholder="Ceritakan ide atau kebutuhanmu..."></textarea>
-                        </div>
-                        <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
-                            <button id="next-to-payment" type="button" class="flex-1 px-5 md:px-6 py-2.5 md:py-3 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm md:text-base font-bold transition flex justify-center items-center gap-2">Lanjut Pembayaran <i class="ph ph-arrow-right"></i></button>
-                            <p id="order-status" class="text-sm text-gray-400"></p>
-                        </div>
+            <!-- Container Modal: Max width 2xl (672px), Max Height 90vh (agar muat di layar) -->
+            <div class="w-full max-w-2xl glass-panel rounded-3xl p-4 md:p-6 border border-white/10 relative transform scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col" id="order-modal-content">
+                
+                <!-- Header Modal (Fixed) -->
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-heading text-xl md:text-2xl font-bold">Form Order Proyek</h3>
+                        <p class="text-xs text-gray-400">Silakan lengkapi data berikut untuk memulai kerjasama.</p>
                     </div>
+                    <button id="close-order-modal" type="button" class="text-gray-400 hover:text-white transition hover:rotate-90 p-2" aria-label="Tutup">
+                        <i class="ph ph-x text-2xl"></i>
+                    </button>
+                </div>
 
-                    <div id="order-step-2" class="md:col-span-2 hidden transition-all duration-300">
-                        <div id="payment-section" class="mt-1 p-5 rounded-2xl border border-dashed border-purple-400/30 bg-purple-900/5">
-                            <div class="flex items-center gap-2 mb-4">
-                                <span class="w-6 h-6 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs font-bold">2</span>
-                                <p class="text-sm text-purple-200 font-semibold">Scan QRIS & Upload Bukti</p>
+                <!-- Scrollable Body Area -->
+                <div class="flex-1 overflow-y-auto custom-scroll pr-2">
+                    <form id="order-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-left">
+                        <div id="order-step-1" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 transition-all duration-300">
+                            <div class="md:col-span-1">
+                                <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Nama</label>
+                                <input id="order-name" name="name" type="text" required class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition text-sm" placeholder="Nama lengkap"/>
+                            </div>
+                            <div class="md:col-span-1">
+                                <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">WhatsApp</label>
+                                <input id="order-contact" name="contact" type="text" required class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition text-sm" placeholder="08xxxxxxxxxx"/>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Email</label>
+                                <input id="order-email" name="email" type="email" required class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition text-sm" placeholder="nama@email.com"/>
                             </div>
                             
-                            <div class="flex flex-col sm:flex-row gap-5">
-                                <div class="w-full sm:w-1/3">
-                                    <a id="qris-image-link" href="#" target="_blank" class="block rounded-xl overflow-hidden border border-white/10 hover:border-purple-400 transition group relative">
-                                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                            <i class="ph ph-magnifying-glass-plus text-2xl"></i>
-                                        </div>
-                                        <img id="qris-image-preview" src="https://placehold.co/600x600/111111/8b5cf6?text=QRIS+Loading..." alt="QRIS" class="w-full aspect-square object-cover">
-                                    </a>
+                            <div class="md:col-span-1">
+                                <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Kategori Layanan</label>
+                                <div class="relative">
+                                    <select id="order-category" name="category" required class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 appearance-none text-gray-300 text-sm">
+                                        <option value="" disabled selected>Pilih kategori...</option>
+                                        <option value="Personal Portofolio Web">Personal Portofolio Web</option>
+                                        <option value="Sistem Informasi Sekolah/Bisnis">Sistem Informasi Sekolah/Bisnis</option>
+                                        <option value="Maintenance & Optimalisasi Web">Maintenance & Optimalisasi Web</option>
+                                        <option value="Custom Request">Custom Request</option>
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
                                 </div>
-                                <div class="flex-1 space-y-4">
-                                    <div>
-                                        <label class="block text-xs text-gray-400 mb-2">Upload Bukti Transfer</label>
-                                        <label class="flex flex-col items-center justify-center w-full h-24 border border-white/10 border-dashed rounded-xl cursor-pointer hover:bg-white/5 transition bg-black/20">
-                                            <div class="flex flex-col items-center justify-center pt-2 pb-3">
-                                                <i class="ph ph-upload-simple text-gray-400 text-xl mb-1"></i>
-                                                <p class="text-xs text-gray-400">Klik untuk upload gambar</p>
-                                            </div>
-                                            <input id="payment-proof" name="paymentProof" type="file" accept="image/*" required class="hidden" />
-                                        </label>
-                                        <div id="file-name-display" class="text-xs text-purple-400 mt-2 truncate hidden"></div>
-                                        <img id="payment-proof-preview" class="hidden mt-2 w-full max-h-32 object-contain rounded-lg border border-white/10 bg-black" />
-                                    </div>
-                                    
-                                    <label class="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition">
-                                        <input id="payment-confirm" name="paymentConfirmed" type="checkbox" class="mt-1 w-4 h-4 accent-purple-500 rounded" required>
-                                        <span class="text-xs text-gray-300 leading-snug">Saya menyatakan telah melakukan pembayaran sesuai nominal yang disepakati.</span>
-                                    </label>
+                            </div>
+
+                            <div class="md:col-span-1">
+                                <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Pilih Paket</label>
+                                <div class="relative">
+                                    <select id="order-package" name="package" required class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 appearance-none text-gray-300 text-sm">
+                                        <option value="" disabled selected>-- Pilih Kategori Dulu --</option>
+                                    </select>
+                                    <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
                                 </div>
+                                <input type="hidden" id="order-price" name="price">
+                                <input type="hidden" id="order-package-desc" name="packageDesc">
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Tambahan / Catatan</label>
+                                <textarea id="order-note" name="message" rows="2" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition text-sm" placeholder="Catatan tambahan (Opsional)"></textarea>
+                            </div>
+                            
+                            <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
+                                <button id="next-to-payment" type="button" class="flex-1 px-4 md:px-6 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm font-bold transition flex justify-center items-center gap-2">Lanjut Pembayaran <i class="ph ph-arrow-right"></i></button>
+                                <p id="order-status" class="text-xs text-gray-400"></p>
                             </div>
                         </div>
 
-                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                            <button id="back-to-details" type="button" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-bold transition text-gray-300">Kembali</button>
-                            <button id="submit-order" type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-bold transition shadow-lg shadow-purple-900/20 text-white flex justify-center items-center gap-2">
-                                <i class="ph ph-paper-plane-right"></i> Kirim Order
-                            </button>
+                        <!-- STEP 2: PEMBAYARAN (HORIZONTAL LAYOUT ON DESKTOP) -->
+                        <div id="order-step-2" class="md:col-span-2 hidden transition-all duration-300">
+                            
+                            <!-- Rincian Pesanan (Compact) -->
+                            <div class="mb-4 p-3 rounded-xl border border-purple-500/30 bg-purple-500/10">
+                                <div class="flex justify-between items-end mb-1">
+                                    <span id="summary-package-name" class="text-white font-bold text-sm md:text-base">Paket Belum Dipilih</span>
+                                    <span id="summary-price" class="text-green-400 font-mono font-bold text-lg">Rp 0</span>
+                                </div>
+                                <p id="summary-desc" class="text-[10px] text-gray-400">Deskripsi paket...</p>
+                            </div>
+
+                            <div id="payment-section" class="mt-2 p-4 rounded-2xl border border-dashed border-purple-400/30 bg-purple-900/5">
+                                <!-- Grid Layout: Left (Info QR), Right (Form) -->
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                                    
+                                    <!-- KOLOM KIRI (Desktop: 5/12) -->
+                                    <div class="md:col-span-5 flex flex-col gap-4">
+                                        <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Metode Pembayaran</label>
+                                        <select id="payment-method" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 appearance-none text-white text-sm">
+                                            <option value="qris">QRIS (All Payment)</option>
+                                            <option value="shopeepay">ShopeePay</option>
+                                            <option value="gopay">GoPay</option>
+                                            <option value="dana">Dana</option>
+                                            <option value="ovo">OVO</option>
+                                        </select>
+
+                                        <!-- Area QRIS / E-Wallet -->
+                                        <div class="mt-2">
+                                            <div id="qris-container" class="block">
+                                                <a id="qris-image-link" href="#" target="_blank" class="block rounded-xl overflow-hidden border border-white/10 hover:border-purple-400 transition group relative mx-auto max-w-[220px]">
+                                                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                                        <i class="ph ph-magnifying-glass-plus text-xl"></i>
+                                                    </div>
+                                                    <img id="qris-image-preview" src="https://placehold.co/300x300/111111/8b5cf6?text=QRIS+Loading..." alt="QRIS" class="w-full aspect-square object-cover">
+                                                </a>
+                                            </div>
+                                            <div id="ewallet-container" class="hidden flex flex-col items-center text-center bg-black/40 border border-white/10 rounded-xl p-4 max-w-[220px] mx-auto">
+                                                <div id="ewallet-icon" class="text-3xl mb-1 text-orange-400"><i class="ph ph-shopping-bag"></i></div>
+                                                <p class="text-[10px] text-gray-400 mb-1">Nomor E-Wallet</p>
+                                                <p id="ewallet-number" class="text-sm font-bold font-mono text-white tracking-wider mb-2 cursor-pointer hover:text-purple-400 transition" onclick="copyToClipboard()">0812-3456-7890</p>
+                                                <button type="button" onclick="copyToClipboard()" class="text-[10px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded-full transition text-gray-300 w-full">
+                                                    <i class="ph ph-copy"></i> Salin Nomor
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <p id="payment-instruction-text" class="text-[10px] text-gray-400 bg-white/5 p-2 rounded-lg border border-white/5 text-center">
+                                            Scan QRIS menggunakan aplikasi e-wallet Anda.
+                                        </p>
+                                    </div>
+
+                                    <!-- KOLOM KANAN (Desktop: 7/12) -->
+                                    <div class="md:col-span-7 flex flex-col gap-3 h-full">
+                                        <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Upload Bukti Transfer</label>
+                                        
+                                        <label class="flex flex-col items-center justify-center w-full h-20 border border-white/10 border-dashed rounded-xl cursor-pointer hover:bg-white/5 transition bg-black/20 group">
+                                            <i class="ph ph-upload-simple text-gray-400 text-lg mb-1 group-hover:text-purple-400 transition"></i>
+                                            <p class="text-[10px] text-gray-400">Klik untuk upload gambar</p>
+                                            <input id="payment-proof" name="paymentProof" type="file" accept="image/*" required class="hidden" />
+                                        </label>
+                                        
+                                        <div id="file-name-display" class="text-[10px] text-purple-400 truncate hidden"></div>
+                                        <img id="payment-proof-preview" class="hidden max-h-24 object-contain rounded-lg border border-white/10 bg-black w-full" />
+                                        
+                                        <label class="flex items-start gap-2 p-2 rounded-lg bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition mt-1">
+                                            <input id="payment-confirm" name="paymentConfirmed" type="checkbox" class="mt-1 w-3 h-3 accent-purple-500 rounded" required>
+                                            <span class="text-[10px] text-gray-300 leading-snug">Saya menyatakan telah melakukan pembayaran sesuai nominal.</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                                <button id="back-to-details" type="button" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-bold transition text-gray-300 text-sm">Kembali</button>
+                                <button id="submit-order" type="submit" class="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-bold transition shadow-lg shadow-purple-900/20 text-white flex justify-center items-center gap-2 text-sm">
+                                    <i class="ph ph-paper-plane-right"></i> Kirim Order
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Success/Processing Overlay -->
+        <div id="payment-overlay" class="fixed inset-0 z-[130] hidden flex-col items-center justify-center bg-black/90 backdrop-blur-xl">
+            <div id="overlay-processing" class="text-center">
+                <i class="ph ph-spinner animate-spin text-6xl text-purple-500 mb-6"></i>
+                <h3 class="text-2xl font-heading font-bold text-white mb-2">Mendeteksi Pembayaran...</h3>
+                <p class="text-gray-400">Mohon tunggu, sistem sedang memverifikasi transaksi Anda secara otomatis.</p>
+            </div>
+            <div id="overlay-success" class="text-center hidden">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.5)]">
+                    <i class="ph ph-check text-4xl text-white"></i>
+                </div>
+                <h3 class="text-3xl font-heading font-bold text-white mb-2">Pembayaran Berhasil!</h3>
+                <p class="text-gray-400 mb-8">Terima kasih. Orderan Anda telah masuk ke sistem kami.</p>
+                <div class="text-sm text-purple-400 animate-pulse">
+                    Mengarahkan kembali...
+                </div>
             </div>
         </div>
 
@@ -450,28 +536,43 @@
 
     <script>
         /* --- CONFIGURATION --- */
-        // Masukkan URL Google Apps Script di bawah ini
-        const ORDER_WEB_APP_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE';
-        // Masukkan URL Gambar QRIS (Direct Link) di bawah ini
-        const QRIS_IMAGE_URL = 'PASTE_YOUR_QRIS_IMAGE_URL_HERE';
+        const ORDER_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwJIU_-FyB9s9hrSu2DwjDnYR97WkmLjbfgenHIN0tFkUJa-bx51bkx1qRf9yicvpA/exec';
+        const QRIS_IMAGE_URL = 'https://i.ibb.co.com/5X664XdX/Whats-App-Image-2026-02-13-at-08-45-43.jpg';
+        const USER_EWALLET_NUMBER = '083833917486'; // Ganti dengan nomor Anda
 
+        /* --- DATA HARGA & PAKET --- */
+        const serviceData = {
+            "Personal Portofolio Web": {
+                "Basic": { price: "Rp 200.000", desc: "1 halaman landing + about + contact" },
+                "Standard": { price: "Rp 350.000", desc: "multi-section, animasi, responsive, modern UI" },
+                "Premium": { price: "Rp 500.000", desc: "dashboard admin ringan / custom design unik" }
+            },
+            "Sistem Informasi Sekolah/Bisnis": {
+                "Basic": { price: "Rp 750.000", desc: "CRUD sederhana, 1 role user" },
+                "Standard": { price: "Rp 1.200.000", desc: "multi-role: admin + user, laporan, export data" },
+                "Advanced": { price: "Rp 1.800.000", desc: "dashboard analytics, upload file, dll" }
+            },
+            "Maintenance & Optimalisasi Web": {
+                "Fix bug ringan": { price: "Rp 200.000", desc: "Perbaikan error kecil" },
+                "Refactor / optimasi performa": { price: "Rp 400.000", desc: "Optimalisasi kecepatan & kode" },
+                "Redesign UI sebagian": { price: "Rp 450.000", desc: "Perbaikan tampilan pada halaman tertentu" }
+            },
+            "Custom Request": {
+                "Negosiasi": { price: "TBD", desc: "Hubungi admin untuk harga" }
+            }
+        };
 
         /* --- PRELOADER LOGIC --- */
         window.addEventListener('load', () => {
             const preloader = document.getElementById('preloader');
             const progress = document.getElementById('loader-progress');
-            
-            // Animasi loading bar
             progress.style.width = '100%';
-            
             setTimeout(() => {
                 preloader.style.opacity = '0';
                 preloader.style.visibility = 'hidden';
-                
-                // Mulai scroll animation setelah loading selesai
                 initScrollReveal();
                 typeWriterEffect();
-            }, 1500); // Durasi loading palsu (1.5 detik)
+            }, 1500);
         });
 
         /* --- TYPEWRITER EFFECT --- */
@@ -479,12 +580,11 @@
             const textElement = document.getElementById('typewriter-text');
             const text = "Membangun pengalaman web yang modern & interaktif. Menggabungkan estetika desain dengan kode yang presisi.";
             let i = 0;
-            
             function type() {
                 if (i < text.length) {
                     textElement.innerHTML += text.charAt(i);
                     i++;
-                    setTimeout(type, 30); // Kecepatan mengetik
+                    setTimeout(type, 30);
                 }
             }
             type();
@@ -493,45 +593,34 @@
         /* --- SCROLL REVEAL (INTERSECTION OBSERVER) --- */
         function initScrollReveal() {
             const reveals = document.querySelectorAll('.reveal');
-            
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('active');
-                        observer.unobserve(entry.target); // Hanya animasi sekali
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, {
-                threshold: 0.1,
-                rootMargin: "0px 0px -50px 0px"
-            });
-
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
             reveals.forEach(el => observer.observe(el));
         }
 
         /* --- 3D TILT EFFECT (LIGHTWEIGHT CUSTOM SCRIPT) --- */
         const tiltCards = document.querySelectorAll('.tilt-card');
-        
         tiltCards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; // x position within the element.
-                const y = e.clientY - rect.top;  // y position within the element.
-                
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -5; // Max rotation deg
+                const rotateX = ((y - centerY) / centerY) * -5;
                 const rotateY = ((x - centerX) / centerX) * 5;
-
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
             });
-
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(1)`;
             });
         });
-
 
         /* --- LOGIC UTAMA (SAMA SEPERTI SEBELUMNYA) --- */
         const menuToggle = document.getElementById('menu-toggle');
@@ -541,7 +630,6 @@
         const mobileLinks = document.querySelectorAll('.mobile-link');
         const navbar = document.getElementById('navbar');
 
-        // Navbar Blur on Scroll
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 navbar.classList.add('bg-black/60', 'shadow-lg');
@@ -566,12 +654,10 @@
                 document.body.classList.remove('overflow-hidden');
             }
         }
-
         menuToggle.addEventListener('click', toggleMenu);
         mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
 
-
-        /* --- ORDER FORM LOGIC --- */
+        /* --- ORDER FORM LOGIC (UPDATED) --- */
         const orderModal = document.getElementById('order-modal');
         const orderModalContent = document.getElementById('order-modal-content');
         const openOrderModalBtn = document.getElementById('open-order-modal');
@@ -585,20 +671,36 @@
         const paymentProofPreview = document.getElementById('payment-proof-preview');
         const fileNameDisplay = document.getElementById('file-name-display');
         const orderStatus = document.getElementById('order-status');
+        
+        // Service Select Elements
+        const categorySelect = document.getElementById('order-category');
+        const packageSelect = document.getElementById('order-package');
+        const priceInput = document.getElementById('order-price');
+        const packageDescInput = document.getElementById('order-package-desc');
+
+        // Payment Elements
+        const paymentMethodSelect = document.getElementById('payment-method');
+        const qrisContainer = document.getElementById('qris-container');
+        const ewalletContainer = document.getElementById('ewallet-container');
+        const paymentInstruction = document.getElementById('payment-instruction-text');
+        const ewalletNumberDisplay = document.getElementById('ewallet-number');
+        const ewalletIconDisplay = document.getElementById('ewallet-icon');
+
+        // Summary Elements
+        const summaryPkgName = document.getElementById('summary-package-name');
+        const summaryPrice = document.getElementById('summary-price');
+        const summaryDesc = document.getElementById('summary-desc');
 
         function setOrderModal(open) {
             if (open) {
                 orderModal.classList.remove('hidden');
                 orderModal.classList.add('flex');
-                // Small delay for animation
                 setTimeout(() => {
                     orderModal.classList.remove('opacity-0');
                     orderModalContent.classList.remove('scale-95');
                     orderModalContent.classList.add('scale-100');
                 }, 10);
                 document.body.classList.add('overflow-hidden');
-                
-                // Setup QRIS
                 if (QRIS_IMAGE_URL && !QRIS_IMAGE_URL.includes('PASTE_YOUR')) {
                     document.getElementById('qris-image-preview').src = QRIS_IMAGE_URL;
                     document.getElementById('qris-image-link').href = QRIS_IMAGE_URL;
@@ -617,8 +719,34 @@
 
         openOrderModalBtn.addEventListener('click', () => setOrderModal(true));
         closeOrderModalBtn.addEventListener('click', () => setOrderModal(false));
-        
-        // Step Navigation
+
+        // 1. Cascading Dropdown Logic (Category -> Package)
+        categorySelect.addEventListener('change', () => {
+            const selectedCategory = categorySelect.value;
+            const packages = serviceData[selectedCategory];
+            
+            packageSelect.innerHTML = '<option value="" disabled selected>Pilih paket...</option>';
+            
+            for (const [pkgName, pkgData] of Object.entries(packages)) {
+                const option = document.createElement('option');
+                option.value = pkgName;
+                option.textContent = `${pkgName} - ${pkgData.price}`;
+                packageSelect.appendChild(option);
+            }
+            priceInput.value = '';
+            packageDescInput.value = '';
+        });
+
+        packageSelect.addEventListener('change', () => {
+            const selectedCategory = categorySelect.value;
+            const selectedPackage = packageSelect.value;
+            const data = serviceData[selectedCategory][selectedPackage];
+            
+            priceInput.value = data.price;
+            packageDescInput.value = data.desc;
+        });
+
+        // 2. Step Navigation & Summary Update
         nextToPaymentBtn.addEventListener('click', () => {
             const inputs = stepOne.querySelectorAll('input, select, textarea');
             let valid = true;
@@ -627,12 +755,22 @@
             });
 
             if(valid) {
+                const cat = categorySelect.value;
+                const pkg = packageSelect.value;
+                const price = priceInput.value;
+                const desc = packageDescInput.value;
+
+                summaryPkgName.textContent = `${cat} - ${pkg}`;
+                summaryPrice.textContent = price;
+                summaryDesc.textContent = desc;
+
                 stepOne.classList.add('hidden');
                 stepTwo.classList.remove('hidden');
                 orderStatus.textContent = '';
+                updatePaymentView();
             } else {
                 orderStatus.textContent = 'Mohon lengkapi data di atas.';
-                orderStatus.className = 'text-sm text-red-400';
+                orderStatus.className = 'text-xs text-red-400';
             }
         });
 
@@ -640,6 +778,62 @@
             stepOne.classList.remove('hidden');
             stepTwo.classList.add('hidden');
         });
+
+        // 3. Payment Method Switcher Logic
+        function updatePaymentView() {
+            const method = paymentMethodSelect.value;
+            const number = USER_EWALLET_NUMBER;
+            qrisContainer.classList.add('hidden');
+            ewalletContainer.classList.add('hidden');
+            
+            if (method === 'qris') {
+                qrisContainer.classList.remove('hidden');
+                paymentInstruction.innerHTML = 'Scan QRIS di atas menggunakan aplikasi e-wallet atau mobile banking Anda.';
+            } else {
+                ewalletContainer.classList.remove('hidden');
+                ewalletNumberDisplay.textContent = number;
+                let colorClass = 'text-white';
+                let iconHtml = '';
+
+                switch(method) {
+                    case 'shopeepay':
+                        colorClass = 'text-orange-500';
+                        iconHtml = '<i class="ph ph-shopping-bag"></i>';
+                        paymentInstruction.innerHTML = `Buka aplikasi <b>Shopee</b> dan transfer ke nomor ${number}.`;
+                        break;
+                    case 'gopay':
+                        colorClass = 'text-green-500';
+                        iconHtml = '<i class="ph ph-bicycle"></i>';
+                        paymentInstruction.innerHTML = `Buka aplikasi <b>GoJek</b> dan transfer ke nomor ${number}.`;
+                        break;
+                    case 'dana':
+                        colorClass = 'text-blue-500';
+                        iconHtml = '<i class="ph ph-wallet"></i>';
+                        paymentInstruction.innerHTML = `Buka aplikasi <b>Dana</b> dan transfer ke nomor ${number}.`;
+                        break;
+                    case 'ovo':
+                        colorClass = 'text-purple-500';
+                        iconHtml = '<i class="ph ph-circle"></i>';
+                        paymentInstruction.innerHTML = `Buka aplikasi <b>OVO</b> dan transfer ke nomor ${number}.`;
+                        break;
+                }
+                ewalletIconDisplay.className = `text-3xl mb-1 ${colorClass}`;
+                ewalletIconDisplay.innerHTML = iconHtml;
+            }
+        }
+
+        paymentMethodSelect.addEventListener('change', updatePaymentView);
+
+        window.copyToClipboard = function() {
+            const number = USER_EWALLET_NUMBER;
+            navigator.clipboard.writeText(number).then(() => {
+                const originalText = ewalletNumberDisplay.textContent;
+                ewalletNumberDisplay.textContent = 'Tersalin!';
+                setTimeout(() => {
+                    ewalletNumberDisplay.textContent = originalText;
+                }, 1500);
+            });
+        }
 
         // File Input Preview
         paymentProofInput.addEventListener('change', () => {
@@ -656,7 +850,7 @@
             }
         });
 
-        // Submit Logic
+        // Submit Logic with Auto-Detection Simulation
         async function fileToDataUrl(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -669,6 +863,9 @@
         orderForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submit-order');
+            const overlay = document.getElementById('payment-overlay');
+            const overlayProcessing = document.getElementById('overlay-processing');
+            const overlaySuccess = document.getElementById('overlay-success');
             
             if (!ORDER_WEB_APP_URL || ORDER_WEB_APP_URL.includes('PASTE_YOUR')) {
                 alert("URL Google Apps Script belum disetting!");
@@ -680,6 +877,7 @@
             
             const formData = new FormData(orderForm);
             const file = paymentProofInput.files[0];
+            const selectedMethod = paymentMethodSelect.value;
             
             try {
                 const base64File = await fileToDataUrl(file);
@@ -688,39 +886,39 @@
                     name: formData.get('name'),
                     contact: formData.get('contact'),
                     email: formData.get('email'),
-                    orderType: formData.get('orderType'),
+                    category: formData.get('category'),
+                    package: formData.get('package'),
+                    price: formData.get('price'),
+                    packageDesc: formData.get('packageDesc'),
                     message: formData.get('message'),
+                    paymentMethod: selectedMethod,
                     paymentConfirmed: true,
                     paymentProofName: file.name,
                     paymentProofDataUrl: base64File,
                     createdAt: new Date().toISOString()
                 };
 
-                await fetch(ORDER_WEB_APP_URL, {
+                fetch(ORDER_WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Penting untuk Google Scripts simple trigger
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                // Karena mode no-cors, kita asumsikan berhasil jika tidak ada error network
-                submitBtn.innerHTML = '<i class="ph ph-check"></i> Terkirim!';
-                submitBtn.classList.remove('from-purple-600', 'to-blue-600');
-                submitBtn.classList.add('bg-green-600');
-                
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                overlayProcessing.classList.remove('hidden');
+                overlaySuccess.classList.add('hidden');
+
                 setTimeout(() => {
-                    alert("Order berhasil dikirim! Admin akan menghubungi Anda via WhatsApp.");
-                    setOrderModal(false);
-                    orderForm.reset();
-                    stepOne.classList.remove('hidden');
-                    stepTwo.classList.add('hidden');
-                    paymentProofPreview.classList.add('hidden');
-                    fileNameDisplay.classList.add('hidden');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="ph ph-paper-plane-right"></i> Kirim Order';
-                    submitBtn.classList.add('from-purple-600', 'to-blue-600');
-                    submitBtn.classList.remove('bg-green-600');
-                }, 2000);
+                    overlayProcessing.classList.add('hidden');
+                    overlaySuccess.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        window.location.href = window.location.href; 
+                    }, 3000);
+
+                }, 3000); 
 
             } catch (err) {
                 console.error(err);
@@ -770,7 +968,6 @@
         const canvasP = document.getElementById('canvas-particles');
         const ctxP = canvasP.getContext('2d');
         let wP, hP, parts = [];
-        
         function resizeP() { wP = canvasP.width = window.innerWidth; hP = canvasP.height = window.innerHeight; initParts(); }
         class Part {
             constructor() {
