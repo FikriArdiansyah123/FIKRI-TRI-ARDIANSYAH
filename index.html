@@ -6,11 +6,11 @@
     <title>Fikri Tri Ardiansyah | Creative Portfolio</title>
 
     <link rel="icon" type="image/png" href="https://i.ibb.co.com/200C5TSq/Chat-GPT-Image-11-Feb-2026-12-42-35-1.png">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -100,9 +100,49 @@
 
         /* --- SCROLL REVEAL CLASS --- */
         .reveal {
-            opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            opacity: 0;
+            transform: translateY(34px) scale(0.985);
+            filter: blur(10px);
+            transition:
+                opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+                transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+                filter 0.8s ease;
+            transition-delay: var(--reveal-delay, 0ms);
         }
-        .reveal.active { opacity: 1; transform: translateY(0); }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* --- INFINITE MARQUEE --- */
+        .tech-marquee {
+            position: relative;
+            overflow: hidden;
+            mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+        }
+        .tech-marquee-track {
+            display: flex;
+            width: max-content;
+            gap: 12px;
+            animation: marquee var(--marquee-duration, 20s) linear infinite;
+            will-change: transform;
+        }
+        .tech-pill {
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #d1d5db;
+            padding: 8px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
 
         /* --- GLITCH EFFECT --- */
         .glitch-wrapper { position: relative; display: inline-block; }
@@ -142,6 +182,83 @@
         }
         @keyframes blink { 50% { opacity: 0; } }
 
+
+
+        /* --- CINEMATIC AURORA & MICRO-INTERACTIONS --- */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -20%;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(139,92,246,0.35), transparent 35%),
+                radial-gradient(circle at 85% 15%, rgba(59,130,246,0.28), transparent 33%),
+                radial-gradient(circle at 40% 80%, rgba(34,211,238,0.24), transparent 38%);
+            filter: blur(35px) saturate(130%);
+            animation: aurora-shift 16s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 3px 3px;
+            opacity: 0.08;
+            mix-blend-mode: soft-light;
+            animation: grain-jitter 0.25s steps(2) infinite;
+        }
+        .magnetic-btn {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.35s ease;
+            will-change: transform;
+        }
+        .magnetic-btn::after {
+            content: '';
+            position: absolute;
+            top: -160%;
+            left: -60%;
+            width: 60%;
+            height: 420%;
+            transform: rotate(18deg);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+            opacity: 0;
+        }
+        .magnetic-btn:hover::after {
+            opacity: 1;
+            animation: shine-sweep 0.9s ease;
+        }
+        @keyframes aurora-shift {
+            0% { transform: translate3d(-3%, -4%, 0) rotate(0deg) scale(1); }
+            50% { transform: translate3d(4%, 2%, 0) rotate(6deg) scale(1.08); }
+            100% { transform: translate3d(-2%, 5%, 0) rotate(-6deg) scale(1.03); }
+        }
+        @keyframes grain-jitter {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(-1px, 1px); }
+            50% { transform: translate(1px, -1px); }
+            75% { transform: translate(1px, 1px); }
+            100% { transform: translate(-1px, -1px); }
+        }
+        @keyframes shine-sweep {
+            0% { left: -60%; }
+            100% { left: 140%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body::after,
+            .tech-marquee-track,
+            .magnetic-btn::after,
+            .reveal,
+            .glass-panel {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
         /* --- MODAL SCROLLBAR CUSTOM --- */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
@@ -159,14 +276,14 @@
         </div>
     </div>
 
-    <canvas id="canvas-bg"></canvas> 
+    <canvas id="canvas-bg"></canvas>
     <canvas id="canvas-particles"></canvas>
-    <canvas id="canvas-cursor"></canvas> 
-    
+    <canvas id="canvas-cursor"></canvas>
+
     <nav class="fixed top-0 w-full z-[60] border-b border-white/5 bg-black/10 backdrop-blur-md transition-all duration-300" id="navbar">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="font-heading font-bold text-xl tracking-wide hover:text-purple-400 transition z-50 relative">FTA.</a>
-            
+
             <div class="hidden md:flex gap-8 text-sm font-medium text-gray-300 items-center">
                 <a href="#about" class="hover:text-white transition relative group">About<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span></a>
                 <a href="#projects" class="hover:text-white transition relative group">Projects<span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-400 transition-all group-hover:w-full"></span></a>
@@ -189,7 +306,7 @@
     </div>
 
     <main class="pt-32 pb-20 px-6 max-w-6xl mx-auto relative z-10">
-        
+
         <section class="flex flex-col items-center text-center mb-24 min-h-[60vh] justify-center animate-float">
             <div class="reveal mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-900/10 text-purple-200 text-xs font-medium uppercase tracking-wider backdrop-blur-md">
                 <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
@@ -208,12 +325,28 @@
             </p>
 
             <div class="reveal flex flex-wrap justify-center gap-4">
-                <a href="#projects" class="px-8 py-3 bg-white text-black rounded-xl font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]">
+                <a href="#projects" class="magnetic-btn px-8 py-3 bg-white text-black rounded-xl font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]">
                     Lihat Karya
                 </a>
-                <a href="https://github.com/FikriArdiansyah123" target="_blank" class="px-8 py-3 glass-panel rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 group">
+                <a href="https://github.com/FikriArdiansyah123" target="_blank" class="magnetic-btn px-8 py-3 glass-panel rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 group">
                     <i class="ph ph-github-logo text-xl group-hover:rotate-12 transition"></i> GitHub
                 </a>
+            </div>
+        </section>
+
+        <section class="reveal mb-20">
+            <p class="text-[11px] tracking-[0.25em] text-gray-500 uppercase mb-4 text-center">Tech Stack Infinite Flow</p>
+            <div class="tech-marquee">
+                <div class="tech-marquee-track" style="--marquee-duration: 18s;">
+                    <span class="tech-pill">HTML5</span><span class="tech-pill">CSS3</span><span class="tech-pill">Tailwind</span><span class="tech-pill">JavaScript</span><span class="tech-pill">Canvas API</span><span class="tech-pill">Responsive UI</span><span class="tech-pill">Motion Design</span><span class="tech-pill">Intersection Observer</span><span class="tech-pill">Accessibility</span><span class="tech-pill">Performance</span>
+                    <span class="tech-pill">HTML5</span><span class="tech-pill">CSS3</span><span class="tech-pill">Tailwind</span><span class="tech-pill">JavaScript</span><span class="tech-pill">Canvas API</span><span class="tech-pill">Responsive UI</span><span class="tech-pill">Motion Design</span><span class="tech-pill">Intersection Observer</span><span class="tech-pill">Accessibility</span><span class="tech-pill">Performance</span>
+                </div>
+            </div>
+            <div class="tech-marquee mt-3 opacity-80">
+                <div class="tech-marquee-track" style="--marquee-duration: 26s; animation-direction: reverse;">
+                    <span class="tech-pill">React Ready</span><span class="tech-pill">UI/UX</span><span class="tech-pill">SEO Friendly</span><span class="tech-pill">Progressive Enhancement</span><span class="tech-pill">Clean Code</span><span class="tech-pill">GitHub</span><span class="tech-pill">Figma to Web</span><span class="tech-pill">Micro Interactions</span><span class="tech-pill">API Integrations</span><span class="tech-pill">Modern Portfolio</span>
+                    <span class="tech-pill">React Ready</span><span class="tech-pill">UI/UX</span><span class="tech-pill">SEO Friendly</span><span class="tech-pill">Progressive Enhancement</span><span class="tech-pill">Clean Code</span><span class="tech-pill">GitHub</span><span class="tech-pill">Figma to Web</span><span class="tech-pill">Micro Interactions</span><span class="tech-pill">API Integrations</span><span class="tech-pill">Modern Portfolio</span>
+                </div>
             </div>
         </section>
 
@@ -223,7 +356,7 @@
                 <div class="h-[1px] bg-white/10 flex-1 ml-6"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-5 md:auto-rows-[180px]">
-                
+
                 <div class="reveal glass-panel tilt-card md:col-span-2 md:row-span-2 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden group min-h-[320px] md:min-h-0">
                     <div class="absolute top-0 right-0 p-24 bg-purple-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-600/30 transition duration-700"></div>
                     <div class="relative z-10">
@@ -266,7 +399,7 @@
                     </div>
                     <i class="ph ph-arrow-up-right text-gray-500 group-hover:text-white group-hover:-translate-y-1 group-hover:translate-x-1 transition"></i>
                 </a>
-                
+
                 <a href="https://maps.app.goo.gl/hdWu2iSAhWhkayo67" target="_blank" class="reveal glass-panel tilt-card rounded-3xl p-6 flex flex-col justify-center relative overflow-hidden group min-h-[100px] md:min-h-0">
                     <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent transition-opacity group-hover:opacity-40"></div>
                     <p class="text-gray-400 text-xs relative z-10 uppercase tracking-widest font-bold">Location</p>
@@ -336,7 +469,7 @@
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Sistem Informasi Sekolah/Bisnis</li>
                             <li class="flex items-center gap-3 text-sm text-gray-300"><i class="ph ph-check-circle text-purple-400 text-xl"></i> Maintenance & Optimalisasi</li>
                         </ul><br>
-                        <button id="open-order-modal" type="button" class="group inline-flex items-center gap-2 px-6 md:px-7 py-3 md:py-3.5 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm md:text-base font-bold transition shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transform hover:-translate-y-1">
+                        <button id="open-order-modal" type="button" class="magnetic-btn group inline-flex items-center gap-2 px-6 md:px-7 py-3 md:py-3.5 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm md:text-base font-bold transition shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 transform hover:-translate-y-1">
                             <i class="ph ph-paper-plane-tilt group-hover:translate-x-1 transition"></i>
                             Pesan Sekarang
                         </button>
@@ -353,7 +486,7 @@
         <div id="order-modal" class="fixed inset-0 z-[120] hidden items-center justify-center px-4 bg-black/80 backdrop-blur-md opacity-0 transition-opacity duration-300">
             <!-- Container Modal: Max width 2xl (672px), Max Height 90vh (agar muat di layar) -->
             <div class="w-full max-w-2xl glass-panel rounded-3xl p-4 md:p-6 border border-white/10 relative transform scale-95 transition-transform duration-300 max-h-[90vh] flex flex-col" id="order-modal-content">
-                
+
                 <!-- Header Modal (Fixed) -->
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -381,7 +514,7 @@
                                 <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Email</label>
                                 <input id="order-email" name="email" type="email" required class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition text-sm" placeholder="nama@email.com"/>
                             </div>
-                            
+
                             <div class="md:col-span-1">
                                 <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Kategori Layanan</label>
                                 <div class="relative">
@@ -412,7 +545,7 @@
                                 <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 block">Tambahan / Catatan</label>
                                 <textarea id="order-note" name="message" rows="2" class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition text-sm" placeholder="Catatan tambahan (Opsional)"></textarea>
                             </div>
-                            
+
                             <div class="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
                                 <button id="next-to-payment" type="button" class="flex-1 px-4 md:px-6 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm font-bold transition flex justify-center items-center gap-2">Lanjut Pembayaran <i class="ph ph-arrow-right"></i></button>
                                 <p id="order-status" class="text-xs text-gray-400"></p>
@@ -421,7 +554,7 @@
 
                         <!-- STEP 2: PEMBAYARAN (HORIZONTAL LAYOUT ON DESKTOP) -->
                         <div id="order-step-2" class="md:col-span-2 hidden transition-all duration-300">
-                            
+
                             <!-- Rincian Pesanan (Compact) -->
                             <div class="mb-4 p-3 rounded-xl border border-purple-500/30 bg-purple-500/10">
                                 <div class="flex justify-between items-end mb-1">
@@ -434,7 +567,7 @@
                             <div id="payment-section" class="mt-2 p-4 rounded-2xl border border-dashed border-purple-400/30 bg-purple-900/5">
                                 <!-- Grid Layout: Left (Info QR), Right (Form) -->
                                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                                    
+
                                     <!-- KOLOM KIRI (Desktop: 5/12) -->
                                     <div class="md:col-span-5 flex flex-col gap-4">
                                         <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Metode Pembayaran</label>
@@ -465,7 +598,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        
+
                                         <p id="payment-instruction-text" class="text-[10px] text-gray-400 bg-white/5 p-2 rounded-lg border border-white/5 text-center">
                                             Scan QRIS menggunakan aplikasi e-wallet Anda.
                                         </p>
@@ -474,16 +607,16 @@
                                     <!-- KOLOM KANAN (Desktop: 7/12) -->
                                     <div class="md:col-span-7 flex flex-col gap-3 h-full">
                                         <label class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Upload Bukti Transfer</label>
-                                        
+
                                         <label class="flex flex-col items-center justify-center w-full h-20 border border-white/10 border-dashed rounded-xl cursor-pointer hover:bg-white/5 transition bg-black/20 group">
                                             <i class="ph ph-upload-simple text-gray-400 text-lg mb-1 group-hover:text-purple-400 transition"></i>
                                             <p class="text-[10px] text-gray-400">Klik untuk upload gambar</p>
                                             <input id="payment-proof" name="paymentProof" type="file" accept="image/*" required class="hidden" />
                                         </label>
-                                        
+
                                         <div id="file-name-display" class="text-[10px] text-purple-400 truncate hidden"></div>
                                         <img id="payment-proof-preview" class="hidden max-h-24 object-contain rounded-lg border border-white/10 bg-black w-full" />
-                                        
+
                                         <label class="flex items-start gap-2 p-2 rounded-lg bg-white/5 border border-white/5 cursor-pointer hover:bg-white/10 transition mt-1">
                                             <input id="payment-confirm" name="paymentConfirmed" type="checkbox" class="mt-1 w-3 h-3 accent-purple-500 rounded" required>
                                             <span class="text-[10px] text-gray-300 leading-snug">Saya menyatakan telah melakukan pembayaran sesuai nominal.</span>
@@ -526,7 +659,7 @@
         <footer id="contact" class="text-center pt-16 pb-10 border-t border-white/10 mt-20 relative">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50 blur-sm"></div>
             <h2 class="reveal font-heading text-2xl font-bold mb-4">Let's work together</h2>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fikritri579@gmail.com&su=Halo%20Fikri!&body=Saya%20tertarik%20untuk%20bekerja%20sama..." target="_blank" rel="noopener noreferrer" 
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fikritri579@gmail.com&su=Halo%20Fikri!&body=Saya%20tertarik%20untuk%20bekerja%20sama..." target="_blank" rel="noopener noreferrer"
                class="reveal text-2xl md:text-4xl font-bold text-gray-500 hover:text-white transition duration-300 border-b-2 border-transparent hover:border-purple-400 inline-block pb-1 hover:tracking-wide">
                fikritri579@gmail.com
             </a>
@@ -536,9 +669,12 @@
 
     <script>
         /* --- CONFIGURATION --- */
-        const ORDER_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwJIU_-FyB9s9hrSu2DwjDnYR97WkmLjbfgenHIN0tFkUJa-bx51bkx1qRf9yicvpA/exec';
+        const ORDER_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwDkO3e9nhuy8s-eDaazqlm28cWa55jDSyQKGdQLtIXuwWj_-LIJaPMi7U64PE0kiDc/exec';
         const QRIS_IMAGE_URL = 'https://i.ibb.co.com/5X664XdX/Whats-App-Image-2026-02-13-at-08-45-43.jpg';
         const USER_EWALLET_NUMBER = '083833917486'; // Ganti dengan nomor Anda
+        const IS_LOW_END_DEVICE = (navigator.hardwareConcurrency || 8) <= 4;
+        const CANVAS_DPR = Math.min(window.devicePixelRatio || 1, IS_LOW_END_DEVICE ? 1.1 : 1.5);
+        let animationsEnabled = !document.hidden;
 
         /* --- DATA HARGA & PAKET --- */
         const serviceData = {
@@ -593,6 +729,11 @@
         /* --- SCROLL REVEAL (INTERSECTION OBSERVER) --- */
         function initScrollReveal() {
             const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((el, index) => {
+                const stagger = (index % 8) * 85;
+                el.style.setProperty('--reveal-delay', `${stagger}ms`);
+            });
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
@@ -600,7 +741,8 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            }, { threshold: 0.12, rootMargin: "0px 0px -60px 0px" });
+
             reveals.forEach(el => observer.observe(el));
         }
 
@@ -671,7 +813,7 @@
         const paymentProofPreview = document.getElementById('payment-proof-preview');
         const fileNameDisplay = document.getElementById('file-name-display');
         const orderStatus = document.getElementById('order-status');
-        
+
         // Service Select Elements
         const categorySelect = document.getElementById('order-category');
         const packageSelect = document.getElementById('order-package');
@@ -724,9 +866,9 @@
         categorySelect.addEventListener('change', () => {
             const selectedCategory = categorySelect.value;
             const packages = serviceData[selectedCategory];
-            
+
             packageSelect.innerHTML = '<option value="" disabled selected>Pilih paket...</option>';
-            
+
             for (const [pkgName, pkgData] of Object.entries(packages)) {
                 const option = document.createElement('option');
                 option.value = pkgName;
@@ -741,7 +883,7 @@
             const selectedCategory = categorySelect.value;
             const selectedPackage = packageSelect.value;
             const data = serviceData[selectedCategory][selectedPackage];
-            
+
             priceInput.value = data.price;
             packageDescInput.value = data.desc;
         });
@@ -785,7 +927,7 @@
             const number = USER_EWALLET_NUMBER;
             qrisContainer.classList.add('hidden');
             ewalletContainer.classList.add('hidden');
-            
+
             if (method === 'qris') {
                 qrisContainer.classList.remove('hidden');
                 paymentInstruction.innerHTML = 'Scan QRIS di atas menggunakan aplikasi e-wallet atau mobile banking Anda.';
@@ -866,7 +1008,7 @@
             const overlay = document.getElementById('payment-overlay');
             const overlayProcessing = document.getElementById('overlay-processing');
             const overlaySuccess = document.getElementById('overlay-success');
-            
+
             if (!ORDER_WEB_APP_URL || ORDER_WEB_APP_URL.includes('PASTE_YOUR')) {
                 alert("URL Google Apps Script belum disetting!");
                 return;
@@ -874,14 +1016,14 @@
 
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Mengirim...';
-            
+
             const formData = new FormData(orderForm);
             const file = paymentProofInput.files[0];
             const selectedMethod = paymentMethodSelect.value;
-            
+
             try {
                 const base64File = await fileToDataUrl(file);
-                
+
                 const payload = {
                     name: formData.get('name'),
                     contact: formData.get('contact'),
@@ -915,10 +1057,10 @@
                     overlaySuccess.classList.remove('hidden');
 
                     setTimeout(() => {
-                        window.location.href = window.location.href; 
+                        window.location.href = window.location.href;
                     }, 3000);
 
-                }, 3000); 
+                }, 3000);
 
             } catch (err) {
                 console.error(err);
@@ -929,84 +1071,229 @@
         });
 
 
+
         /* --- CANVAS ANIMATION (BACKGROUND) --- */
         const canvasBg = document.getElementById('canvas-bg');
         const ctxBg = canvasBg.getContext('2d');
         let wBg, hBg, orbs = [];
-        const mouse = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        const pointerTarget = { x: mouse.x, y: mouse.y };
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        function resizeBg() { wBg = canvasBg.width = window.innerWidth; hBg = canvasBg.height = window.innerHeight; initOrbs(); }
+        function setCanvasSize(canvas, ctx, width, height) {
+            canvas.width = Math.floor(width * CANVAS_DPR);
+            canvas.height = Math.floor(height * CANVAS_DPR);
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.setTransform(CANVAS_DPR, 0, 0, CANVAS_DPR, 0, 0);
+        }
+
+        function resizeBg() {
+            wBg = window.innerWidth;
+            hBg = window.innerHeight;
+            setCanvasSize(canvasBg, ctxBg, wBg, hBg);
+            initOrbs();
+        }
+
         window.addEventListener('resize', resizeBg);
-        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY });
+        window.addEventListener('mousemove', e => {
+            pointerTarget.x = e.clientX;
+            pointerTarget.y = e.clientY;
+        }, { passive: true });
 
         class Orb {
-            constructor(color, r, speed) {
-                this.r = r; this.color = color; this.speed = speed;
-                this.x = Math.random() * wBg; this.y = Math.random() * hBg;
+            constructor(color, r, speed, wobble) {
+                this.r = r;
+                this.color = color;
+                this.speed = speed;
+                this.wobble = wobble;
+                this.x = Math.random() * wBg;
+                this.y = Math.random() * hBg;
                 this.t = Math.random() * 100;
             }
+
             update() {
-                this.t += 0.005;
-                this.x += (mouse.x - this.x) * this.speed * 0.5 + Math.sin(this.t) * 2;
-                this.y += (mouse.y - this.y) * this.speed * 0.5 + Math.cos(this.t) * 2;
+                this.t += 0.007;
+                const pull = reducedMotion ? 0.12 : 0.35;
+                this.x += (mouse.x - this.x) * this.speed * pull + Math.sin(this.t * 0.9) * this.wobble;
+                this.y += (mouse.y - this.y) * this.speed * pull + Math.cos(this.t) * this.wobble;
             }
+
             draw() {
                 const g = ctxBg.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
-                g.addColorStop(0, this.color); g.addColorStop(1, 'rgba(0,0,0,0)');
-                ctxBg.fillStyle = g; ctxBg.beginPath(); ctxBg.arc(this.x, this.y, this.r, 0, Math.PI*2); ctxBg.fill();
+                g.addColorStop(0, this.color);
+                g.addColorStop(1, 'rgba(0,0,0,0)');
+                ctxBg.fillStyle = g;
+                ctxBg.beginPath();
+                ctxBg.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctxBg.fill();
             }
         }
-        function initOrbs() { orbs = [new Orb('rgba(139, 92, 246, 0.4)', wBg*0.4, 0.03), new Orb('rgba(59, 130, 246, 0.3)', wBg*0.3, 0.02)]; }
+
+        function initOrbs() {
+            orbs = [
+                new Orb('rgba(139, 92, 246, 0.42)', wBg * 0.42, 0.03, 1.5),
+                new Orb('rgba(59, 130, 246, 0.34)', wBg * 0.35, 0.02, 1.1),
+                new Orb('rgba(34, 211, 238, 0.26)', wBg * 0.28, 0.025, 1.3)
+            ];
+        }
+
         function animateBg() {
-            ctxBg.clearRect(0,0,wBg,hBg); ctxBg.globalCompositeOperation = 'screen';
-            orbs.forEach(o => { o.update(); o.draw(); });
+            if (!animationsEnabled) {
+                requestAnimationFrame(animateBg);
+                return;
+            }
+            mouse.x += (pointerTarget.x - mouse.x) * 0.18;
+            mouse.y += (pointerTarget.y - mouse.y) * 0.18;
+            ctxBg.clearRect(0, 0, wBg, hBg);
+            ctxBg.globalCompositeOperation = 'screen';
+            orbs.forEach(o => {
+                o.update();
+                o.draw();
+            });
             requestAnimationFrame(animateBg);
         }
-        resizeBg(); animateBg();
 
-        /* --- CANVAS PARTICLES --- */
+        resizeBg();
+        animateBg();
+
+        /* --- CANVAS PARTICLES (NEURAL NETWORK / CONSTELLATION) --- */
         const canvasP = document.getElementById('canvas-particles');
         const ctxP = canvasP.getContext('2d');
-        let wP, hP, parts = [];
-        function resizeP() { wP = canvasP.width = window.innerWidth; hP = canvasP.height = window.innerHeight; initParts(); }
-        class Part {
+        let wP, hP, nodes = [];
+
+        function resizeP() {
+            wP = window.innerWidth;
+            hP = window.innerHeight;
+            setCanvasSize(canvasP, ctxP, wP, hP);
+            initNodes();
+        }
+
+        class Node {
             constructor() {
-                this.x = Math.random()*wP; this.y = Math.random()*hP; 
-                this.s = Math.random()*2.4 + 0.8; this.vy = Math.random()*0.6 + 0.2;
-                this.a = Math.random()*0.35 + 0.4;
+                this.x = Math.random() * wP;
+                this.y = Math.random() * hP;
+                this.vx = (Math.random() - 0.5) * 0.45;
+                this.vy = (Math.random() - 0.5) * 0.45;
+                this.r = Math.random() * 1.6 + 0.8;
+                this.alpha = Math.random() * 0.4 + 0.35;
             }
-            update() { this.y -= this.vy; if(this.y < 0) this.y = hP; }
+
+            update() {
+                const mx = (mouse.x / wP - 0.5) * 0.2;
+                const my = (mouse.y / hP - 0.5) * 0.2;
+                this.x += this.vx + mx;
+                this.y += this.vy + my;
+
+                if (this.x < 0 || this.x > wP) this.vx *= -1;
+                if (this.y < 0 || this.y > hP) this.vy *= -1;
+
+                this.x = Math.max(0, Math.min(wP, this.x));
+                this.y = Math.max(0, Math.min(hP, this.y));
+            }
+
             draw() {
-                ctxP.fillStyle = `rgba(255,255,255,${this.a})`;
-                ctxP.shadowBlur = 10;
-                ctxP.shadowColor = 'rgba(255,255,255,0.7)';
+                ctxP.fillStyle = `rgba(219,234,254,${this.alpha})`;
+                ctxP.shadowBlur = 12;
+                ctxP.shadowColor = 'rgba(139,92,246,0.75)';
                 ctxP.beginPath();
-                ctxP.arc(this.x, this.y, this.s, 0, Math.PI*2);
+                ctxP.arc(this.x, this.y, this.r, 0, Math.PI * 2);
                 ctxP.fill();
                 ctxP.shadowBlur = 0;
             }
         }
-        function initParts() { parts = Array(60).fill().map(() => new Part()); }
-        function animateP() { ctxP.clearRect(0,0,wP,hP); parts.forEach(p=>{p.update();p.draw()}); requestAnimationFrame(animateP); }
-        window.addEventListener('resize', resizeP); resizeP(); animateP();
 
-        /* --- CANVAS CURSOR --- */
+        function initNodes() {
+            const count = window.innerWidth < 768 ? (IS_LOW_END_DEVICE ? 34 : 46) : (IS_LOW_END_DEVICE ? 54 : 74);
+            nodes = Array(count).fill().map(() => new Node());
+        }
+
+        function drawNetwork() {
+            const maxDist = IS_LOW_END_DEVICE ? 105 : 125;
+            const maxDistSq = maxDist * maxDist;
+            for (let i = 0; i < nodes.length; i++) {
+                const a = nodes[i];
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const b = nodes[j];
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < maxDistSq) {
+                        const dist = Math.sqrt(distSq);
+                        const alpha = (1 - dist / maxDist) * 0.22;
+                        ctxP.strokeStyle = `rgba(129,140,248,${alpha})`;
+                        ctxP.lineWidth = 0.7;
+                        ctxP.beginPath();
+                        ctxP.moveTo(a.x, a.y);
+                        ctxP.lineTo(b.x, b.y);
+                        ctxP.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateP() {
+            if (!animationsEnabled) {
+                requestAnimationFrame(animateP);
+                return;
+            }
+            ctxP.clearRect(0, 0, wP, hP);
+            nodes.forEach(n => {
+                n.update();
+                n.draw();
+            });
+            drawNetwork();
+            requestAnimationFrame(animateP);
+        }
+
+        window.addEventListener('resize', resizeP);
+        resizeP();
+        animateP();
+
+        /* --- CANVAS CURSOR (KEMBALI KE STYLE SEBELUMNYA: SPARK ONLY) --- */
         const canvasC = document.getElementById('canvas-cursor');
         const ctxC = canvasC.getContext('2d');
         let wC, hC, sparks = [];
-        function resizeC() { wC = canvasC.width = window.innerWidth; hC = canvasC.height = window.innerHeight; }
+
+        function resizeC() {
+            wC = window.innerWidth;
+            hC = window.innerHeight;
+            setCanvasSize(canvasC, ctxC, wC, hC);
+        }
+
         class Spark {
             constructor(x,y) {
-                this.x=x; this.y=y; this.v={x:(Math.random()-0.5)*5, y:(Math.random()-0.5)*5};
-                this.life=1; this.color = `hsl(${Math.random()*60 + 240}, 100%, 70%)`;
+                this.x = x;
+                this.y = y;
+                this.v = { x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 5 };
+                this.life = 1;
+                this.color = `hsl(${Math.random() * 60 + 240}, 100%, 70%)`;
             }
-            update() { this.x+=this.v.x; this.y+=this.v.y; this.life-=0.03; this.v.x*=0.95; this.v.y*=0.95; }
-            draw() { ctxC.globalAlpha=this.life; ctxC.fillStyle=this.color; ctxC.beginPath(); ctxC.arc(this.x,this.y,2,0,Math.PI*2); ctxC.fill(); }
+            update() {
+                this.x += this.v.x;
+                this.y += this.v.y;
+                this.life -= 0.03;
+                this.v.x *= 0.95;
+                this.v.y *= 0.95;
+            }
+            draw() {
+                ctxC.globalAlpha = this.life;
+                ctxC.fillStyle = this.color;
+                ctxC.beginPath();
+                ctxC.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctxC.fill();
+            }
         }
-        window.addEventListener('resize', resizeC); resizeC();
+
+        window.addEventListener('resize', resizeC);
+        resizeC();
 
         function createCursorSparks(x, y, amount = 3) {
             for (let i = 0; i < amount; i++) sparks.push(new Spark(x, y));
+            const sparkLimit = IS_LOW_END_DEVICE ? 90 : 140;
+            if (sparks.length > sparkLimit) {
+                sparks.splice(0, sparks.length - sparkLimit);
+            }
         }
 
         window.addEventListener('mousemove', (e) => createCursorSparks(e.clientX, e.clientY));
@@ -1018,11 +1305,48 @@
         }, { passive: true });
 
         function animateC() {
-            ctxC.clearRect(0,0,wC,hC);
-            sparks.forEach((s,i) => { s.update(); s.draw(); if(s.life<=0) sparks.splice(i,1); });
+            if (!animationsEnabled) {
+                requestAnimationFrame(animateC);
+                return;
+            }
+            ctxC.clearRect(0, 0, wC, hC);
+            sparks = sparks.filter((s) => {
+                s.update();
+                if (s.life > 0) s.draw();
+                return s.life > 0;
+            });
+            ctxC.globalAlpha = 1;
             requestAnimationFrame(animateC);
         }
+
+        document.addEventListener('visibilitychange', () => {
+            animationsEnabled = !document.hidden;
+        });
+
         animateC();
+
+        if (IS_LOW_END_DEVICE) {
+            document.querySelectorAll('.tech-marquee-track').forEach((track) => {
+                const current = parseFloat(getComputedStyle(track).animationDuration) || 20;
+                track.style.animationDuration = `${current * 1.4}s`;
+            });
+        }
+
+        /* --- MAGNETIC BUTTON EFFECT --- */
+        const magneticButtons = document.querySelectorAll('.magnetic-btn');
+        magneticButtons.forEach(btn => {
+            if (IS_LOW_END_DEVICE) return;
+            btn.addEventListener('mousemove', e => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.12}px, ${y * 0.16}px) scale(1.03)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0) scale(1)';
+            });
+        });
+
 
     </script>
 </body>
